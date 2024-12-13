@@ -3,6 +3,7 @@ import { Navbar, Nav, Container, Button, Dropdown } from "react-bootstrap";
 import logo from "../../assets/img/logo/logo.png";
 import { Link, useNavigate } from "react-router-dom";
 import { FaUserCircle, FaEdit } from "react-icons/fa";
+import "bootstrap/dist/css/bootstrap.min.css";
 import "./header.css";
 
 function Header() {
@@ -55,7 +56,8 @@ function Header() {
 
             <Navbar.Collapse
               id="navbarNavDropdown"
-              className="justify-content-center">
+              className="justify-content-center"
+            >
               <Nav className="text-center">
                 <Link to="/" className="nav-link text-primary fw-bold">
                   Home
