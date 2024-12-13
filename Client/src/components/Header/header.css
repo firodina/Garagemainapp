@@ -1,0 +1,51 @@
+/* Header.css */
+.site-header {
+  background-color: #f8f9fa; /* Ensure the background color is set */
+}
+
+.sticky-header {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  z-index: 1020; /* Ensures the header stays above other content */
+}
+
+/* Top Bar */
+.top-bar {
+  background-color: #007bff; /* Blue background */
+  color: white;
+}
+
+.top-bar .container-fluid {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.top-bar .left-column {
+  display: flex;
+  align-items: center;
+}
+
+.top-bar .text,
+.top-bar .office-hour {
+  margin-right: 1rem;
+}
+
+.top-bar .right-column {
+  display: flex;
+  align-items: center;
+}
+
+.top-bar .phone-number {
+  font-weight: bold;
+}
+
+/* Additional specificity to ensure styles are applied */
+.site-header .navbar {
+  background-color: #f8f9fa !important; /* Use !important if necessary */
+}
+
+.site-header .nav-link {
+  color: #007bff !important; /* Ensure link color */
+}
