@@ -1,0 +1,59 @@
+.hero-container {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+	
+}
+
+.hero-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+}
+
+.hero-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  color: #fff;
+  text-align: center;
+}
+
+.slide-sub-title {
+  font-size: 1.2rem;
+  font-weight: 400;
+  margin-bottom: 1rem;
+  color: #ff0000; /* Red text for the subtitle */
+}
+
+.slide-title {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+	color: #fff;
+}
+
+.btn-wrapper .btn {
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  border-radius: 0;
+}
+
+.btn-primary {
+  background-color: #ff0000;
+  border: none;
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: #fff;
+  border: 2px solid #fff;
+}
