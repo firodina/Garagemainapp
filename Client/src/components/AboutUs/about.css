@@ -1,0 +1,205 @@
+.about-us-img-left {
+  margin-right: 30px;
+}
+.about-us-img-wrap {
+  position: relative;
+}
+.afex__parallax-effect-wrap {
+  min-height: 600px;
+  position: relative;
+  overflow: hidden;
+}
+.afex__parallax-effect-wrap,
+.layer {
+  display: block;
+  height: 100%;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+.about-us-img-info {
+  width: 310px;
+  height: 310px;
+  background-color: white;
+  display: flex;
+  -webkit-box-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  justify-content: center;
+  text-align: center;
+  /* position: absolute; */
+  top: 70%;
+  box-shadow: 0 16px 32px 0 rgba(7, 28, 31, 0.1);
+  left: 0;
+  margin: auto;
+  right: 0;
+}
+
+/* aboutus.css */
+
+/* Container styling for the About Us section */
+.ltn__about-us-area {
+  position: relative;
+  padding-top: 80px;
+  padding-bottom: 85px;
+}
+
+/* Basic styling for images within the parallax effect */
+.ltn__effect-img {
+  position: absolute;
+  will-change: transform;
+}
+
+/* Layered images for different depths */
+.layer {
+  position: absolute;
+  /* top: 230px; */
+}
+.layer-big {
+  top: 0px;
+  height: 470px;
+  margin-right: 30px;
+}
+
+/* Positioning for specific images within the layers */
+.ltn__effect-img-top-left {
+  top: 0;
+  left: 0;
+}
+
+.ltn__effect-img-top-right {
+  top: 0;
+  right: 0;
+}
+
+.ltn__effect-img-center-left {
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+}
+
+.ltn__effect-img-center-right {
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+}
+
+.ltn__effect-img-bottom-left {
+  bottom: 0;
+  left: 0;
+}
+
+.ltn__effect-img-bottom-right {
+  bottom: 0;
+  right: 0;
+}
+
+.ltn__effect-img-top-center {
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.wave-container {
+  position: relative;
+  width: 600px;
+  height: 600px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.wave {
+  position: absolute;
+  width: 100%;
+  left: 0px;
+  height: 30%;
+  margin: 0px;
+  border-radius: 50%;
+  /* background: rgba(0, 123, 255, 0.5);  */
+  animation: wave-animation 5.3333s linear 0.1s infinite normal;
+}
+
+.square {
+  /* position: relative; */
+  width: 350px; /* Size of the square */
+  height: 350px;
+  /* background-color: #007bff;  */
+}
+
+/* Animations for any specific elements like waves */
+@keyframes wave-animation {
+  0% {
+    transform: translateX(0%) scale(1.1);
+  }
+  25% {
+    transform: translateX(5%) scale(1.1);
+  }
+  50% {
+    transform: translateY(-5%) scale(1.1);
+  }
+  75% {
+    transform: translateX(-5%) scale(1.1);
+  }
+  100% {
+    transform: translateY(5%) scale(1.1);
+  }
+  100% {
+    transform: translateY(0%) scale(1.1);
+  }
+  75% {
+    transform: translateX(-5%) scale(1.1);
+  }
+  50% {
+    transform: translateY(-5%) scale(1.1);
+  }
+  25% {
+    transform: translateX(5%) scale(1.1);
+  }
+  0% {
+    transform: translateY(0%) scale(1.1);
+  }
+}
+
+/* General styling for text content */
+.section-title-area {
+  margin-bottom: 30px;
+}
+
+.section-subtitle {
+  font-size: 16px;
+  color: #999;
+  text-transform: uppercase;
+}
+
+.section-title {
+  font-size: 36px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Styling for the "Call Us" section */
+.about-call-us {
+  margin-top: 30px;
+  display: flex;
+  align-items: center;
+}
+
+.call-us-icon img {
+  max-width: 50px;
+  margin-right: 15px;
+}
+
+.call-us-info h2 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+}
+
+.call-us-info a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.call-us-info a:hover {
+  text-decoration: underline;
+}
