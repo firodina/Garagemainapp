@@ -1,0 +1,116 @@
+.afex__service-area {
+  padding-top: 100px;
+  margin-bottom: 200px;
+}
+.afex__primary-bg {
+  background-color: #0b262a;
+}
+.afex__section-title {
+  color: white;
+  font-size: 72px;
+  font-weight: 700;
+  margin-bottom: 15px;
+  line-height: 1;
+}
+.why-choose-us-feature-item {
+  display: flex;
+  margin-bottom: 10px;
+  max-width: 480px;
+  .why-choose-us-feature-icon {
+    margin-right: 20px;
+    font-size: 70px;
+    line-height: 1.2;
+    color: var(--ltn__secondary-color);
+    min-width: fit-content;
+  }
+  .why-choose-us-feature-brief {
+    h3 {
+      margin-bottom: 5px;
+    }
+  }
+}
+.why-choose-us-img-wrap img {
+  max-width: 65%;
+}
+.why-choose-us-img-2 {
+  margin-top: -15%;
+  img {
+    border: 15px solid var(--white);
+  }
+}
+
+/* ----------------------------------------------------
+    Service Area
+---------------------------------------------------- */
+.afex__service-item-1 {
+  background-color: var(--white);
+  margin-bottom: 100px;
+  position: relative;
+  .service-item-img {
+    position: relative;
+    overflow: hidden;
+    img {
+      transition: all 0.5s ease 0s;
+    }
+  }
+  .service-item-icon {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 70px;
+    height: 70px;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    color: var(--ltn__secondary-color);
+  }
+  .service-item-brief {
+    padding: 32px 40px 10px;
+    h3 {
+      margin-bottom: 5px;
+    }
+  }
+  &:hover {
+    .service-item-img {
+      img {
+        transform: scale(1.1);
+      }
+    }
+  }
+}
+
+.ltn__service-item-2 {
+  padding: 0px 45px 30px;
+  margin-bottom: 50px;
+  margin-top: 35px;
+  .service-item-icon {
+    font-size: 80px;
+    line-height: 1;
+    top: -35px;
+    position: relative;
+    color: var(--ltn__secondary-color);
+  }
+  .service-item-brief {
+    padding-top: 50px;
+  }
+  .service-item-icon + .service-item-brief {
+    padding-top: 0;
+  }
+  ul {
+    margin-bottom: 10px;
+    padding: 0;
+    li {
+      list-style: none;
+      margin-top: 10px;
+      span {
+        color: var(--ltn__color-1);
+      }
+    }
+  }
+  hr {
+    margin-top: 25px;
+    margin-bottom: 25px;
+  }
+}
