@@ -14,7 +14,7 @@ function HomePage() {
 			<WhyUS />
       <Service />
       <Location />
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 }

@@ -1,8 +1,8 @@
 import React from 'react'
 import { Container, Row, Col, Card } from "react-bootstrap";
-import img1 from "../../assets/abe/240-g.jpg";		
-import img2 from "../../assets/abe/240-g.jpg";	
-import img3 from "../../assets/abe/240-g.jpg";	
+import img1 from "../../assets/abe/african-american-mechanics-man-examining-260nw-2200863261.webp";		
+import img2 from "../../assets/abe/360_F_435892680_6r3bwoH0puBT3jRjNdQWxOnCCG2GhSne.jpg";	
+import img3 from "../../assets/abe/360_F_438680586_n8TDQfzLlEL0M7Q4KyiAsvxPOUl9m5IQ.jpg";	
 import img4 from "../../assets/abe/240-g.jpg";
 import img5 from "../../assets/abe/240-g.jpg";
 import img6 from "../../assets/abe/240-g.jpg";

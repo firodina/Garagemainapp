@@ -90,14 +90,12 @@ function Footer() {
                   <div className="ltn__blog-meta">
                     <ul>
                       <li className="ltn__blog-date">
-                        <i className="far fa-envelope"></i> June 24, 2020
+                        <i className="far fa-envelope"></i> Dec 14, 2024
                       </li>
                     </ul>
                   </div>
                   <h4 className="ltn__blog-title">
-                    <a href="blog-details.html">
-                      The branch of biology that deals with the normal.
-                    </a>
+                    <a href="blog-details.html">Lorem ipsum dolor sit amet</a>
                   </h4>
                 </div>
                 {/* Repeat for other blog items */}
@@ -121,7 +119,7 @@ function Footer() {
                     <h6>Copyright & Design By</h6>
                     <h4>
                       <span className="current-year">
-                        Evangadi Jan, 2024 Group Two
+                        Lorem ipsum dolor sit amet
                       </span>
                     </h4>
                   </div>

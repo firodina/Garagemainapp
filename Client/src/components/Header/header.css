@@ -43,7 +43,7 @@
 
 /* Additional specificity to ensure styles are applied */
 .site-header .navbar {
-  background-color: #f8f9fa !important; /* Use !important if necessary */
+  background-color: #fff !important; /* Use !important if necessary */
 }
 
 .site-header .nav-link {

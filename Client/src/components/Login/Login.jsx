@@ -12,7 +12,7 @@ import {
 
 function Login() {
   return (
-    <Container fluid className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
+    <Container fluid className="d-flex justify-content-center align-items-center" style={{ height: "60vh" }}>
       <Row className="w-100">
         {/* Left Image Section */}
         <Col md={6} className="d-none d-md-block">
@@ -29,7 +29,7 @@ function Login() {
 
         {/* Form Section */}
         <Col md={6} className="d-flex justify-content-center align-items-center">
-          <div className="p-4 bg-light rounded shadow" style={{ width: "100%", maxWidth: "550px" }}>
+          <div className="p-4 bg-light rounded shadow" style={{ width: "100%", maxWidth: "600px" }}>
             <h2 className="text-center mb-4">Login to Your Account</h2>
             <Form>
               <Form.Group className="mb-3">

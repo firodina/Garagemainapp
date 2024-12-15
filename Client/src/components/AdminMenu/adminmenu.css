@@ -1,0 +1,44 @@
+/* Ensure the admin menu container takes up the full width */
+.admin-menu {
+  width: 250px; /* Adjust width as needed */
+  font-family: Arial, sans-serif;
+  height: 100vh;
+}
+
+/* Style for the list group items */
+.list-group-item {
+  padding: 10px 15px;
+  margin: 5px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.list-group-item:hover {
+  background-color: #f0f0f0; /* Hover effect */
+}
+
+/* Style for the icons */
+.icon {
+  margin-right: 10px;
+}
+
+/* Style for the sub-menu container */
+.sub-menu {
+  padding-left: 15px;
+}
+
+/* Ensure sub-menu items have a smaller width and are centered */
+.sub-menu .list-group-item {
+  width: 100%;
+  text-align: center; /* Center text */
+}
+
+/* Style for the expand/collapse icons */
+.expand-icon {
+  font-size: 12px;
+  margin-left: auto;
+}

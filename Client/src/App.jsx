@@ -9,6 +9,9 @@ import { Routes, Route } from "react-router-dom";
 import Login from "./components/Login/Login";
 import Footer from "./components/Footer/Footer";
 import ScheduleAppointment from "./components/ScheduleAppointment/ScheduleAppointment";
+import RegistrationForm from "./components/Register/Register";
+import ContactUs from "./components/ContactUs/ContactUs";
+// import AdminDashboard from "./components/Admin/Admin";
 
 function App() {
   return (
@@ -16,7 +19,10 @@ function App() {
       <Header />
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<RegistrationForm />} />
         <Route path="/schedule" element={<ScheduleAppointment />} />
+        {/* <Route path="/admin" element={<AdminDashboard/>}/> */}
+        <Route path="/contact" element={<ContactUs/>}/>
         <Route path="/" element={<HomePage />} />
       </Routes>
       <Footer />

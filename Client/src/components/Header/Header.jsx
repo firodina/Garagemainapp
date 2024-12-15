@@ -1,6 +1,6 @@
 import React from "react";
 import { Navbar, Nav, Container, Button, Dropdown } from "react-bootstrap";
-import logo from "../../assets/img/logo/logo.png";
+import logo from "../../assets/img/logo/pngtree-automotive-logo-template-design-png-image_4781399 (1).jpg";
 import { Link, useNavigate } from "react-router-dom";
 import { FaUserCircle, FaEdit } from "react-icons/fa";
 import "./header.css";
@@ -10,24 +10,6 @@ function Header() {
 
   return (
     <>
-      <div className="top-bar bg-primary text-white py-2">
-        <div className="container-fluid d-flex justify-content-between align-items-center">
-          <div className="left-column d-flex align-items-center">
-            <div className="text me-4">
-              Schedule Appointment: <strong>1800 456 7890</strong>
-            </div>
-            <div className="office-hour me-4">
-              Monday - Saturday 7:00AM - 6:00PM
-            </div>
-          </div>
-          <div className="right-column d-flex align-items-center">
-            <div className="phone-number me-4">
-              <strong>Welcome</strong>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Main Header */}
       <header className="site-header sticky-header">
         <Navbar
