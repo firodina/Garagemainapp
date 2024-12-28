@@ -146,25 +146,7 @@ function About() {
                       <img src={img6} alt="#" />
                     </div>
                   </li>
-                  <li
-                    className="layer layer-big wave-container"
-                    data-depth="0.50"
-                  >
-                    <div className="wave">
-                      <div className="about-us-img-info square">
-                        <div className="about-us-img-info-inner">
-                          <h1>
-                            <span className="counter">{count}</span>
-                            <span>+</span>
-                          </h1>
-                          <h6>
-                            <span>Years</span> Of Experience
-                          </h6>
-                          <span className="dots-bottom"></span>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
+                  
                 </ul>
               </Parallax>
             </div>
@@ -179,25 +161,25 @@ function About() {
                   Get Amazing Service From Us<span>.</span>
                 </h1>
                 <p>
-                  At Auto Care Garage, we pride ourselves on delivering top-quality
-                  automotive services. Our team of skilled technicians is
-                  dedicated to keeping your vehicle running smoothly and
-                  efficiently.
+                In 1950, the newly formed company rented in office 
+                at Menelik square. The company was called Orbis Trading &
+                 Technical Center . In 1950, industrial and commercial vehicles,
+                  agricultural and industrial machinery were hardly in demand. The 
+                  number of cars in Addis Ababa was just a few thousands and a new 
+                  company dealing with these products seemed an ill-advised business..
                 </p>
               </div>
 
               <p>
-                From routine maintenance like oil changes and tire rotations to
-                more complex repairs such as engine diagnostics and brake
-                replacements, we have the expertise to handle it all. Our
-                state-of-the-art facility is equipped with the latest tools and
-                technology to ensure your vehicle receives the best care
-                possible. Whether you're in need of a quick tune-up or a
-                full-scale repair, you can trust us to provide exceptional
-                service and customer care. We strive to make your experience as
-                convenient as possible, offering flexible scheduling and
-                transparent pricing. Let Auto Care Garage be your go-to destination
-                for all your automotive needs.
+              Orbis sales two model vehicles, Mercedes-Benz and Renault.
+               In addition it sales different machinery , spare parts and 
+               give maintenance service with different departments which gives
+                different services. The company’s main job lies in selling different
+                 vehicles, machinery and spare parts to customers, and in order to do 
+                 this, the company has created a web with different suppliers in the
+                  world starting from Germany, France, Brazil,Cairo…etc. As well to
+                   contact and do business with the different suppliers and different 
+                   departments have taken these responsibilities
               </p>
               <hr />
               <div className="about-call-us">
@@ -215,11 +197,11 @@ function About() {
                     </Link>
                     .
                   </p>
-                  <h2>
+                  {/* <h2>
                     <Link to="tel:+123456789">507-452-1254</Link>{" "}
                     <small> or </small>{" "}
                     <Link to="tel:+123456789">508-452-1253</Link>
-                  </h2>
+                  </h2> */}
                 </div>
               </div>
             </div>

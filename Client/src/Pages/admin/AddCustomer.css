@@ -1,0 +1,45 @@
+/* Addcustomer.css */
+
+.admin-pages {
+    height: 100vh;
+  }
+  
+  .sidebar {
+    padding: 20px;
+    border-right: 2px solid #343a40; /* Subtle border for the sidebar */
+  }
+  
+  .content-area {
+    padding: 20px;
+  }
+  
+  .content {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+  }
+  
+  /* Animation styles for content */
+  .fade-enter {
+    opacity: 0;
+  }
+  .fade-enter-active {
+    opacity: 1;
+    transition: opacity 300ms;
+  }
+  .fade-exit {
+    opacity: 1;
+  }
+  .fade-exit-active {
+    opacity: 0;
+    transition: opacity 300ms;
+  }
+  .form-container {
+    background-color: #f8f9fa; /* Light gray background */
+    border-radius: 8px; /* Rounded corners */
+    padding: 20px; /* Padding inside the form */
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    margin-top: 30px; /* Add top margin */
+  }
+  

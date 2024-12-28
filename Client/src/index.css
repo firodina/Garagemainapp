@@ -19,7 +19,7 @@
 /* For Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: blue #f1f1f1;
+  /* scrollbar-color: blue #f1f1f1; */
 }
 
 /* Optional: Apply overflow settings */
@@ -41,6 +41,7 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  background-color: #272626;
 }
 
 main {

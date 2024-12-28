@@ -12,7 +12,7 @@ import {
 
 function Login() {
   return (
-    <Container fluid className="d-flex justify-content-center align-items-center" style={{ height: "60vh" }}>
+    <Container fluid className="d-flex justify-content-center align-items-center mt-5" style={{ height: "60vh" }}>
       <Row className="w-100">
         {/* Left Image Section */}
         <Col md={6} className="d-none d-md-block">
@@ -49,7 +49,7 @@ function Login() {
               <div className="text-center my-3">or</div>
 
               <div className="d-grid">
-                <Button variant="primary">
+                <Button variant="danger">
                   Sign in with Google
                 </Button>
               </div>

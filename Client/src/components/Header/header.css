@@ -1,6 +1,6 @@
 /* Header.css */
 .site-header {
-  background-color: #f8f9fa; /* Ensure the background color is set */
+  background-color: #fff; /* Ensure the background color is set */
 }
 
 .sticky-header {
@@ -12,7 +12,7 @@
 
 /* Top Bar */
 .top-bar {
-  background-color: #007bff; /* Blue background */
+  background-color: #007bff; 
   color: white;
 }
 
@@ -43,9 +43,16 @@
 
 /* Additional specificity to ensure styles are applied */
 .site-header .navbar {
-  background-color: #fff !important; /* Use !important if necessary */
+  background-color:#ffffff!important; /* Use !important if necessary */
 }
 
-.site-header .nav-link {
-  color: #007bff !important; /* Ensure link color */
-}
+/* .site-header .nav-link {
+  color: #007bff !important; } */
+  .ms-auto .bttnn{
+    background-color: red;
+    border:none;
+    display: inline;
+  }
+  .ms-auto button{
+  display: inline;
+  }
