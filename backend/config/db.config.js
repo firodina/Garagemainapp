@@ -3,10 +3,10 @@ const mysql = require("mysql2/promise");
 // create the connection to database
 // create the connection pool
 const dbconfig = {
-	host: process.env.DB_HOST || 'localhost',
-	user: process.env.DB_USER || 'main-garage',
-	password: process.env.DB_PASSWORD || 123456,
-	database: process.env.DB_NAME || 'main-garage',
+	host: process.env.DB_HOST,
+	user: process.env.DB_USER,
+	password: process.env.DB_PASSWORD,
+	database: process.env.DB_NAME,
 };
 // create the connection pool
 const pool = mysql.createPool(dbconfig);
