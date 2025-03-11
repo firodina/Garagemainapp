@@ -1,0 +1,97 @@
+.circle {
+    font-size: 1.25rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .full-height {
+    margin-bottom: 200px;
+  }
+  .label {
+    font-size: 0.875rem;
+    position: relative;
+    padding: 0.5rem 0;
+  }
+  
+  .label .underline {
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    height: 2px;
+    background-color: #4caf50; /* Green color for the underline */
+  }
+  
+  .step-content {
+    margin-bottom: 1rem;
+  }
+  
+  .button-group {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .next-button,
+  .prev-button {
+    width: auto;
+  }
+  
+  .next-button {
+    background-color: #4caf50; /* Green color for Next button */
+  }
+  
+  .prev-button {
+    background-color: #6c757d; /* Grey color for Previous button */
+  }
+  
+  .next-button:hover,
+  .prev-button:hover {
+    opacity: 0.8;
+  }
+  
+  button:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+  .full-height {
+    height: 100vh;
+  }
+  
+  .step-container {
+    padding: 20px;
+  }
+  
+  .circle {
+    width: 3rem;
+    height: 3rem;
+    font-size: 1.25rem;
+  }
+  
+  .label-box {
+    border: 2px solid #28a745; /* Green border for completed/active steps */
+    border-radius: 10px;
+    padding: 5px 10px;
+    margin-top: 10px;
+    display: inline-block;
+    transition: border-color 0.3s ease-in-out;
+  }
+  
+  .label-box.text-muted {
+    border-color: #ccc; /* Light gray border for inactive steps */
+  }
+  
+  .label-text {
+    font-size: 1rem;
+  }
+  
+  .underline {
+    border-bottom: 2px solid #28a745;
+    width: 50%;
+    margin-top: 5px;
+  }
+  
+  .step-footer {
+    margin-top: 20px;
+  }
+  

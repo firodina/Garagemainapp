@@ -1,0 +1,21 @@
+/* Custom CSS for compact table */
+.compact-table th,
+.compact-table td {
+  padding: 0.5rem; /* Reduce padding */
+}
+
+.compact-table thead th {
+  font-size: 0.875rem; /* Smaller font size for headers */
+}
+
+.compact-table tbody td {
+  font-size: 0.875rem; /* Smaller font size for body text */
+}
+
+.compact-table tbody tr {
+  height: auto; /* Ensure rows are compact */
+}
+
+.table-wrapper {
+  overflow-x: auto; /* Allow horizontal scrolling if needed */
+}

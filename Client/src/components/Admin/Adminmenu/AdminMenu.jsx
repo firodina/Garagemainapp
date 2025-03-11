@@ -89,6 +89,9 @@ const AdminMenu =()=> {
             <Link to="/admin/employees" className="list-group-item">
               <FaUser className="icon" /> View Employees
             </Link>
+            <Link to="/admin/employees" className="list-group-item">
+              <FaUser className="icon" /> Delete Employees
+            </Link>
           </div>
         )}
 
@@ -109,6 +112,9 @@ const AdminMenu =()=> {
             <Link to="/admin/services/view" className="list-group-item">
               <FaCog className="icon" /> View Services
             </Link>
+            <Link to="/admin/services/delete" className="list-group-item">
+              <FaCog className="icon" /> Delete Services
+            </Link>
           </div>
         )}
 
@@ -128,6 +134,9 @@ const AdminMenu =()=> {
             </Link>
             <Link to="/admin/customers" className="list-group-item">
               <FaCog className="icon" /> View Customers
+            </Link>
+            <Link to="/admin/delete_customers" className="list-group-item">
+              <FaCog className="icon" /> Delete Customers
             </Link>
           </div>
         )}

@@ -1,0 +1,33 @@
+/* AdminDashboard.css */
+.admin-pages {
+    padding: 1rem; /* Adjust padding around the dashboard */
+  }
+  
+  .admin-left-side {
+    background-color: #f8f9fa; /* Optional: background color for sidebar */
+    height: 100vh; /* Make the sidebar full height */
+    padding: 1rem; /* Adjust padding within the sidebar */
+  }
+  
+  .admin-right-side {
+    padding: 1rem; /* Padding around the main content */
+  }
+  
+  .card {
+    margin-bottom: 1rem; /* Reduce margin between cards */
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .admin-left-side {
+      width: 100%; /* Full width on smaller screens */
+      height: auto; /* Auto height */
+      padding: 0.5rem; /* Reduced padding */
+    }
+  
+    .admin-right-side {
+      width: 100%; /* Full width on smaller screens */
+      padding: 0.5rem; /* Reduced padding */
+    }
+  }
+  

@@ -1,0 +1,42 @@
+/* src/Components/AdminMenu/AdminMenu.css */
+
+.admin-menu {
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .admin-menu h2 {
+    margin-bottom: 20px;
+    color: #343a40;
+  }
+  
+  .list-group {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .list-group-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    color: #495057;
+    text-decoration: none;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .list-group-item:hover {
+    background-color: #e9ecef;
+    color: #007bff;
+  }
+  
+  .icon {
+    margin-right: 10px;
+    font-size: 18px;
+  }
+  

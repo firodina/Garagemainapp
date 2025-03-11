@@ -77,8 +77,7 @@ function Header() {
                   </Dropdown.Item>
                 </Dropdown.Menu>
               </Dropdown >
-
-              <Button className="bttnn" >Login</Button>
+                <Button onClick={() => navigate("/login")}  className="bttnn"  >Login</Button>
             </div>
           </Container>
         </Navbar>
