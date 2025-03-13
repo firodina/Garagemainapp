@@ -1,51 +1,49 @@
-// Import the query function from the db.config.js file 
 const conn = require("../config/db.config");
-// Import the fs module to read our sql file  
-const fs = require('fs');
-// Write a function to create the database tables  
+const fs = require("fs");
+
 async function install() {
-  const queryfile = __dirname + '/sql/initial-queries.sql';
+  const queryfile = __dirname + "/sql/initial-queries.sql";
+  console.log("Reading SQL file from:", queryfile);
+
+  if (!fs.existsSync(queryfile)) {
+    console.error("SQL file not found!");
+    return { message: "SQL file missing", status: 500 };
+  }
+
+  const lines = fs.readFileSync(queryfile, "utf-8").split(/\r?\n/);
   let queries = [];
   let finalMessage = {};
-  let templine = '';
-  
-  const lines = await fs.readFileSync(queryfile, 'utf-8').split('\n');
+  let templine = "";
 
-  const executed = await new Promise((resolve, reject) => {
-    lines.forEach((line) => {
-      if (line.trim().startsWith('--') || line.trim() === '') {
-        return;
-      }
-      templine += line;
-      if (line.trim().endsWith(';')) {
-        const sqlQuery = templine.trim();
-        queries.push(sqlQuery);
-        templine = '';
-      }
-    });
-    resolve("Queries are added to the list");
+  lines.forEach((line) => {
+    if (line.trim().startsWith("--") || line.trim() === "") {
+      return;
+    }
+    templine += line;
+    if (line.trim().endsWith(";")) {
+      queries.push(templine.trim());
+      templine = "";
+    }
   });
+
+  console.log(`Executing ${queries.length} queries...`);
 
   for (let i = 0; i < queries.length; i++) {
     try {
-      console.log(`Executing query: ${queries[i]}`);
-      const result = await conn.query(queries[i]);
-      console.log("Table created");
+      console.log("Executing query:", queries[i]);
+      await conn.query(queries[i]);
+      console.log("✅ Table created successfully.");
     } catch (err) {
-      console.error(`Error executing query: ${queries[i]}`);
-      console.error(err);
-      finalMessage.message = "Not all tables are created";
+      console.error("❌ Error creating table:", err.message, "\nQuery:", queries[i]);
+      finalMessage.message = "Not all tables were created.";
+      break; // Exit the loop after the first error
     }
   }
 
-  if (!finalMessage.message) {
-    finalMessage.message = "All tables are created";
-    finalMessage.status = 200;
-  } else {
-    finalMessage.status = 500;
-  }
-  
+  finalMessage.message = finalMessage.message || "All tables created successfully.";
+  finalMessage.status = finalMessage.message.includes("Not all") ? 500 : 200;
   return finalMessage;
 }
-// Export the install function for use in the controller
+
+
 module.exports = { install };
