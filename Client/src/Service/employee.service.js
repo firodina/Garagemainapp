@@ -1,7 +1,7 @@
 import axios from "axios";
 // A function to send post request to create a new employee
 
-const createEmployee = async (formData, token) => {
+const createEmployee = async (formData) => {
   try {
     const response = await axios.post(
       "http://localhost:3000/api/employee",
@@ -9,20 +9,34 @@ const createEmployee = async (formData, token) => {
       {
         headers: {
           // "x-access-token": token,
-          "Content-Type": "multipart/form-data", // Ensure this header is set correctly
+          "Content-Type": "multipart/form-data", // Ensure the correct Content-Type
         },
       }
     );
 
-    console.log("API Response:", response.data);
-    return response.data;
-  } catch (error) {
-    if (error.response) {
-      console.error("Error Response:", error.response.data);
-      throw new Error(error.response.data.message || "API Error");
+    // Axios parses response.data automatically
+    if (response.status === 200) {
+      return response.data; // Directly return the data
     } else {
-      console.error("Request Error:", error.message);
-      throw new Error("Could not connect to the server");
+      throw new Error(`Request failed with status ${response.status}`);
+    }
+  } catch (error) {
+    // Enhanced error handling
+    if (error.response) {
+      // Server responded with an error
+      console.error("Error response:", error.response.data);
+      throw new Error(
+        error.response.data.error ||
+          `Error ${error.response.status}: ${error.response.statusText}`
+      );
+    } else if (error.request) {
+      // Request was made but no response received
+      console.error("Error request:", error.request);
+      throw new Error("No response received from server");
+    } else {
+      // Something went wrong in setting up the request
+      console.error("Error message:", error.message);
+      throw new Error("An error occurred: " + error.message);
     }
   }
 };

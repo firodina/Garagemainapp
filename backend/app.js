@@ -21,7 +21,7 @@ const app = express();
 // Middleware Parse JSON requests
 app.use(express.json()); 
 
-// app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
 // Add the sanitizer to the express middleware
 app.use(sanitize.middleware);
 // Enable CORS
