@@ -3,10 +3,10 @@ import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import { FaRegSmile } from "react-icons/fa"; // For an icon
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./EmployeeDashboard.css"; // Custom CSS file
-// import { useAuth } from "../../../Contexts/AuthContext";
+import { useAuth } from "../../Contexts/AuthContext";
 import { Link } from "react-router-dom";
 function EmployeeDashboard() {
-//   const { employee } = useAuth();
+  const { employee } = useAuth();
   return (
     <Container className="my-4">
       <Row className="justify-content-center text-center">
@@ -16,7 +16,7 @@ function EmployeeDashboard() {
               <FaRegSmile className="welcome-icon" />
               <Card.Title className="mt-2">
                 Welcome,{" "}
-                {/* {employee ? `${employee.employee_first_name} ` : "Employee"}! */}
+                 {employee ? `${employee.employee_first_name} ` : "Employee"}! 
               </Card.Title>
               <Card.Text>
                 We are excited to have you Here are your dashboard

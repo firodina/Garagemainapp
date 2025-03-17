@@ -311,3 +311,33 @@ CREATE TABLE IF NOT EXISTS service_status_updates (
 INSERT INTO company_roles (company_role_name) VALUES
 ('Employee'), ('Manager'), ('Admin'), ('Customer')
 ON DUPLICATE KEY UPDATE company_role_name = company_role_name;
+
+-- Insert Admin
+INSERT INTO employee (employee_email, active_employee, added_date)
+VALUES ('admin@admins.com', 1, CURRENT_TIMESTAMP);
+
+SET @admin_id = LAST_INSERT_ID();
+
+INSERT INTO employee_info (employee_id, employee_first_name, employee_last_name, employee_phone)
+VALUES (@admin_id, 'Admin', 'Admin', '777-777-7777');
+
+INSERT INTO employee_pass (employee_id, employee_password_hashed)
+VALUES (@admin_id, '$2b$10$ceYuf8esgIge0dnr01SGO.Q8Qhn.c4q4kTg.TS4A40.oj0aSwbhG2');
+
+INSERT INTO employee_role (employee_id, company_role_id)
+VALUES (@admin_id, 3); 
+
+-- Insert Manager
+INSERT INTO employee (employee_email, active_employee, added_date)
+VALUES ('manager@manager.com', 1, CURRENT_TIMESTAMP);
+
+SET @manager_id = LAST_INSERT_ID();
+
+INSERT INTO employee_info (employee_id, employee_first_name, employee_last_name, employee_phone)
+VALUES (@manager_id, 'Manager', 'Manager', '666-666-6666');
+
+INSERT INTO employee_pass (employee_id, employee_password_hashed)
+VALUES (@manager_id, '$2b$10$ceYuf8esgIge0dnr01SGO.Q8Qhn.c4q4kTg.TS4A40.oj0aSwbhG2');
+
+INSERT INTO employee_role (employee_id, company_role_id)
+VALUES (@manager_id, 2);
