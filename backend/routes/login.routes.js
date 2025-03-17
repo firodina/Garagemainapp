@@ -8,5 +8,7 @@ const loginControllers = require("../controllers/login.controller");
 router.post("/api/employee/login", loginControllers.logIn);
 //route costumer login
 // router.post("/api/customer/login", loginControllers.CustomerlogIn);
+
+
 // Export the router
 module.exports = router;

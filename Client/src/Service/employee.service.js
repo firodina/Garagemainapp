@@ -9,7 +9,7 @@ const createEmployee = async (formData) => {
       {
         headers: {
           // "x-access-token": token,
-          "Content-Type": "multipart/form-data", // Ensure the correct Content-Type
+          "Content-Type": "application/json", // Ensure the correct Content-Type
         },
       }
     );
@@ -41,138 +41,138 @@ const createEmployee = async (formData) => {
   }
 };
 
-// // Export all the functions
-// const getAllEmployees = async (token) => {
-//   // console.log(token);
-//   const requestOptions = {
-//     method: "GET",
-//     headers: {
-//       "Content-Type": "application/json",
-//       "x-access-token": token,
-//     },
-//   };
-//   const response = await fetch(
-//     `http://localhost:5000/api/employees`,
+// Export all the functions
+const getAllEmployees = async (token) => {
+  // console.log(token);
+  const requestOptions = {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "x-access-token": token,
+    },
+  };
+  const response = await fetch(
+    `http://localhost:3000/api/employees`,
 
-//     requestOptions
-//   );
-//   return response.json();
-// };
+    requestOptions
+  );
+  return response.json();
+};
 
-// const updateEmployee = async (formData, token) => {
-//   const requestOptions = {
-//     method: "PUT",
-//     headers: {
-//       "Content-Type": "application/json",
-//       "x-access-token": token, // Ensure token is being sent
-//     },
-//     body: JSON.stringify(formData),
-//   };
-//   const response = await fetch(
-//     `http://localhost:5000/api/employee`,
-//     requestOptions
-//   );
-//   return response;
-// };
+const updateEmployee = async (formData, token) => {
+  const requestOptions = {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "x-access-token": token, // Ensure token is being sent
+    },
+    body: JSON.stringify(formData),
+  };
+  const response = await fetch(
+    `http://localhost:3000/api/employee`,
+    requestOptions
+  );
+  return response;
+};
 
-// //delete employee
-// const deleteEmployee = async (employeeId, token) => {
-//   // Construct the URL with the employee ID as a path parameter
-//   const url = `http://localhost:5000/api/employee/${employeeId}`;
+//delete employee
+const deleteEmployee = async (employeeId, token) => {
+  // Construct the URL with the employee ID as a path parameter
+  const url = `http://localhost:3000/api/employee/${employeeId}`;
 
-//   const requestOptions = {
-//     method: "DELETE",
-//     headers: {
-//       "Content-Type": "application/json",
-//       "x-access-token": token, // Ensure token is being sent
-//     },
-//   };
+  const requestOptions = {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      "x-access-token": token, // Ensure token is being sent
+    },
+  };
 
-//   try {
-//     const response = await fetch(url, requestOptions);
+  try {
+    const response = await fetch(url, requestOptions);
 
-//     if (!response.ok) {
-//       const errorText = await response.text(); // Read the error message
-//       throw new Error(errorText);
-//     }
+    if (!response.ok) {
+      const errorText = await response.text(); // Read the error message
+      throw new Error(errorText);
+    }
 
-//     return response.json(); // Assuming the server responds with JSON
-//   } catch (error) {
-//     console.error("Error deleting employee:", error);
-//     throw error; // Rethrow the error to be handled by calling code
-//   }
-// };
+    return response.json(); // Assuming the server responds with JSON
+  } catch (error) {
+    console.error("Error deleting employee:", error);
+    throw error; // Rethrow the error to be handled by calling code
+  }
+};
 
-// //a function to reseet password
-// const resetEmployeePassword = async (employeeId, token) => {
-//   try {
-//     const response = await fetch(
-//       `http://localhost:5000/api/employee/password/${employeeId}`,
-//       {
-//         method: "PUT",
-//         headers: {
-//           "Content-Type": "application/json",
-//           "x-access-token": token,
-//         },
-//       }
-//     );
-//     if (!response.ok) {
-//       throw new Error(`Request failed with status ${response.status}`);
-//     }
-//     return response.json();
-//   } catch (error) {
-//     console.error("Error resetting employee password:", error);
-//   }
-// };
+//a function to reseet password
+const resetEmployeePassword = async (employeeId, token) => {
+  try {
+    const response = await fetch(
+      `http://localhost:3000/api/employee/password/${employeeId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "x-access-token": token,
+        },
+      }
+    );
+    if (!response.ok) {
+      throw new Error(`Request failed with status ${response.status}`);
+    }
+    return response.json();
+  } catch (error) {
+    console.error("Error resetting employee password:", error);
+  }
+};
 
-// const fetchEmployeeById = async (employeeId, token) => {
-//   try {
-//     const response = await fetch(
-//       `http://localhost:5000/api/employee/${employeeId}`,
-//       {
-//         method: "GET",
-//         headers: {
-//           "Content-Type": "application/json",
-//           "x-access-token": token,
-//         },
-//       }
-//     );
-//     if (!response.ok) {
-//       throw new Error(`Request failed with status ${response.status}`);
-//     }
-//     return response.json();
-//   } catch (error) {
-//     console.error("Error fetching employee:", error);
-//   }
-// };
-// const changePassword = (employeeId, newPassword) => {
-//   const url = `http://localhost:5000/api/user/password/${employeeId}`;
-//   const requestOptions = {
-//     method: "PUT",
-//     headers: {
-//       "Content-Type": "application/json",
-//     },
-//     body: JSON.stringify({ newPassword }),
-//   };
-//   fetch(url, requestOptions)
-//     .then((response) => response.json())
-//     .then((data) => {
-//       console.log("Password changed successfully:", data);
-//     })
-//     .catch((error) => {
-//       console.error("Error changing password:", error);
-//     });
-// };
+const fetchEmployeeById = async (employeeId, token) => {
+  try {
+    const response = await fetch(
+      `http://localhost:3000/api/employee/${employeeId}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "x-access-token": token,
+        },
+      }
+    );
+    if (!response.ok) {
+      throw new Error(`Request failed with status ${response.status}`);
+    }
+    return response.json();
+  } catch (error) {
+    console.error("Error fetching employee:", error);
+  }
+};
+const changePassword = (employeeId, newPassword) => {
+  const url = `http://localhost:3000/api/user/password/${employeeId}`;
+  const requestOptions = {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ newPassword }),
+  };
+  fetch(url, requestOptions)
+    .then((response) => response.json())
+    .then((data) => {
+      console.log("Password changed successfully:", data);
+    })
+    .catch((error) => {
+      console.error("Error changing password:", error);
+    });
+};
 
 // Export all the functions
 const employeeService = {
   createEmployee,
-  // getAllEmployees,
-  // updateEmployee,
-  // deleteEmployee,
-  // resetEmployeePassword,
+  getAllEmployees,
+  updateEmployee,
+  deleteEmployee,
+  resetEmployeePassword,
 
-  // fetchEmployeeById,
-  // changePassword,
+  fetchEmployeeById,
+  changePassword,
 };
 export default employeeService;

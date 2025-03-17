@@ -25,7 +25,10 @@ app.use(express.urlencoded({ extended: true }));
 // Add the sanitizer to the express middleware
 app.use(sanitize.middleware);
 // Enable CORS
-app.use(cors(corsOptions)); 
+// app.use(cors(corsOptions)); 
+
+app.use(cors({corsOptions })); // Allow all origins for now (change to your frontend URL in production)
+
 
 // Use the router (Ensure it's a middleware function)
 app.use(router);

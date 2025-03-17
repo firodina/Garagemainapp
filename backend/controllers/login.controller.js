@@ -18,7 +18,7 @@ async function logIn(req, res, next) {
         status: employee.status,
         message: employee.message,
       });
-      // console.log(employee.message);
+      console.log(employee.message);
     }
     // If successful, send a response to the client
     const payload = {

@@ -1,43 +1,47 @@
-// Import the query function from the db.config.js file
-const conn = require("../config/db.config");
-// Import the bcrypt module to do the password comparison
 const bcrypt = require("bcrypt");
-// Import the employee service to get employee by email
 const employeeService = require("./employee.service");
-// Handle employee login
+
 async function logIn(employeeData) {
   try {
     let returnData = {}; // Object to be returned
     const employee = await employeeService.getEmployeeByEmail(
       employeeData.employee_email
     );
+
     if (employee.length === 0) {
-      returnData = {
+      return {
         status: "fail",
         message: "Employee does not exist",
+        statusCode: 404, // Not Found
       };
-      return returnData;
     }
+
     const passwordMatch = await bcrypt.compare(
       employeeData.employee_password,
       employee[0].employee_password_hashed
     );
+
     if (!passwordMatch) {
-      returnData = {
+      return {
         status: "fail",
         message: "Incorrect password",
+        statusCode: 401, // Unauthorized
       };
-      return returnData;
     }
-    returnData = {
+
+    return {
       status: "success",
       data: employee[0],
+      statusCode: 200, // OK
     };
-    return returnData;
   } catch (error) {
     console.log(error);
+    return {
+      status: "error",
+      message: "An internal error occurred",
+      statusCode: 500, // Internal Server Error
+    };
   }
 }
 
-// Export the logIn function
 module.exports = { logIn };

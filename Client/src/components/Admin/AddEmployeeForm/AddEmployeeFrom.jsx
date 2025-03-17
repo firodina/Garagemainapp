@@ -32,6 +32,19 @@ function AddEmployeeForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+   
+      // Add console logs to debug
+      console.log("Submitting form with values:", {
+        employee_email,
+        employee_first_name,
+        employee_last_name,
+        employee_phone,
+        employee_password,
+        active_employee,
+        company_role_id,
+      });
+    
+  
     let valid = true;
 
     // Validation logic
@@ -64,6 +77,7 @@ function AddEmployeeForm() {
     } else {
       setPasswordError("");
     }
+    
 
     if (!valid) {
       return;
@@ -72,10 +86,10 @@ function AddEmployeeForm() {
     // Create a FormData object to handle file uploads
     const formData = new FormData();
     formData.append("employee_email", employee_email);
-    formData.append("employee_first_name", employee_first_name);
-    formData.append("employee_last_name", employee_last_name);
-    formData.append("employee_phone", employee_phone);
-    formData.append("employee_password", employee_password);
+    formData.append("employee_first_name", employee_first_name || ""); // Ensure not undefined
+    formData.append("employee_last_name", employee_last_name || "");
+    formData.append("employee_phone", employee_phone || "");
+    formData.append("employee_password", employee_password || "");
     formData.append("active_employee", String(active_employee));
     formData.append("company_role_id", company_role_id);
 

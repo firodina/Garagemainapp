@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [employee, setEmployee] = useState(null);
   const [userType, setUserType] = useState(null);
-  const [customerId, setCustomerId] = useState(null);
+  // const [customerId, setCustomerId] = useState(null);
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }) => {
           setEmployee(null);
           setUserType(null);
           setIsAdmin(false);
-          setCustomerId(null);
+          // setCustomerId(null);
         }
       } catch (error) {
         console.error("Error checking authentication:", error);
@@ -36,7 +36,7 @@ export const AuthProvider = ({ children }) => {
         setEmployee(null);
         setUserType(null);
         setIsAdmin(false);
-        setCustomerId(null);
+        // setCustomerId(null);
       }
     };
 
@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }) => {
     setIsAdmin(false);
     setEmployee(null);
     setUserType(null);
-    setCustomerId(null);
+    // setCustomerId(null);
     localStorage.removeItem("employee"); // Ensure you clear local storage if it's used
   };
   const value = {
@@ -60,7 +60,7 @@ export const AuthProvider = ({ children }) => {
     employee,
     logout,
     userType,
-    customerId,
+    // customerId,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
