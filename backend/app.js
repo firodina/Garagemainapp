@@ -3,6 +3,9 @@ const express = require('express');
 require('dotenv').config();
 //import core module
 const cors = require('cors');
+
+// Import the path module
+const path = require('path');
 // Import the sanitizer module
 const sanitize = require('sanitize');
 //set the cors options
@@ -20,6 +23,10 @@ const app = express();
 
 // Middleware Parse JSON requests
 app.use(express.json()); 
+
+// Add the express.static middleware to serve static files
+app.use(express.static("public"));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use(express.urlencoded({ extended: true }));
 // Add the sanitizer to the express middleware

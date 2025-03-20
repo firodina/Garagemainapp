@@ -1,49 +1,49 @@
 import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Card, Spinner, Alert } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-// import EmployeeService from "../../../../services/employee.service"; // Adjust path as needed
-// import { useAuth } from "../../../../Contexts/AuthContext";
+import EmployeeService from "../../../Service/employee.service"; // Adjust path as needed
+import { useAuth } from "../../../Contexts/AuthContext";
 
 function EmployeeProfile() {
-//   const [employeeInfo, setEmployee] = useState(null);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState(null);
-//   const { employee } = useAuth();
-//   const employeeId = employee.employee_id;
+  const [employeeInfo, setEmployee] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { employee } = useAuth();
+  const employeeId = employee.employee_id;
 
-//   useEffect(() => {
-//     const fetchEmployeeData = async () => {
-//       try {
-//         const data = await EmployeeService.fetchEmployeeById(employeeId);
-//         setEmployee(data.data);
-//       } catch (error) {
-//         setError("Failed to fetch employee data.");
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
+  useEffect(() => {
+    const fetchEmployeeData = async () => {
+      try {
+        const data = await EmployeeService.fetchEmployeeById(employeeId);
+        setEmployee(data.data);
+      } catch (error) {
+        setError("Failed to fetch employee data.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-//     fetchEmployeeData();
-//   }, [employeeId]);
+    fetchEmployeeData();
+  }, [employeeId]);
 
-//   if (loading) {
-//     return (
-//       <div
-//         className="d-flex justify-content-center align-items-center"
-//         style={{ height: "100vh" }}
-//       >
-//         <Spinner animation="border" />
-//       </div>
-//     );
-//   }
+  if (loading) {
+    return (
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ height: "100vh" }}
+      >
+        <Spinner animation="border" />
+      </div>
+    );
+  }
 
-//   if (error) {
-//     return <Alert variant="danger">{error}</Alert>;
-//   }
+  if (error) {
+    return <Alert variant="danger">{error}</Alert>;
+  }
 
-//   if (!employeeInfo) {
-//     return <div>No employee data found.</div>;
-//   }
+  if (!employeeInfo) {
+    return <div>No employee data found.</div>;
+  }
 
   return (
     <Container className="my-4">
@@ -57,7 +57,7 @@ function EmployeeProfile() {
               <Row className="align-items-center">
                 <Col md={4} className="text-center">
                   <img
-                    src= "default-avatar.png"
+                    src={employeeInfo.employee_image || "default-avatar.png"}
                     alt="Profile"
                     className="img-fluid rounded-circle"
                     style={{
@@ -73,15 +73,15 @@ function EmployeeProfile() {
                   <ul className="list-unstyled">
                     <li>
                       <strong className="fs-5">Name:</strong>{" "}
-                      {/* {`${employeeInfo.employee_first_name} ${employeeInfo.employee_last_name}`} */}
+                      {`${employeeInfo.employee_first_name} ${employeeInfo.employee_last_name}`} 
                     </li>
                     <li>
                       <strong className="fs-5">Email:</strong>{" "}
-                      {/* {employeeInfo.employee_email} */}
+                      {employeeInfo.employee_email} 
                     </li>
                     <li>
                       <strong className="fs-5">Phone:</strong>{" "}
-                      {/* {employeeInfo.employee_phone} */}
+                      {employeeInfo.employee_phone}
                     </li>
                     <li>
                       <strong className="fs-5">Position:</strong> Employee
@@ -91,7 +91,7 @@ function EmployeeProfile() {
                     </li>
                     <li>
                       <strong className="fs-5">Date of Hire:</strong>{" "}
-                      {/* {new Date(employeeInfo.added_date).toLocaleDateString()} */}
+                       {new Date(employeeInfo.added_date).toLocaleDateString()} 
                     </li>
                     {/* Add more fields as needed */}
                   </ul>

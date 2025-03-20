@@ -12,7 +12,6 @@ import "./Assets/sass/style.scss";
 import "./Assets/sass/elements/_button.scss";
 import Login from "./components/Login/Login";
 import Footer from "./components/Footer/Footer";
-import ScheduleAppointment from "./components/ScheduleAppointment/ScheduleAppointment";
 import RegistrationForm from "./components/Register/Register";
 import ContactUs from "./components/ContactUs/ContactUs";
 import AdminDashbord from "./Pages/admin/AdminDashBoard";
@@ -34,6 +33,8 @@ import Employees from "./Pages/admin/Employees";
 import ViewServices from "./Pages/admin/ViewService";
 import Orders from "./Pages/admin/ViewOrder";
 import PrivateAuthRoute from "./components/Auth/PrivateAythRoute"; // Import your PrivateAuthRoute component
+import Strategys from "./Pages/Strategys";
+import Schedule from "./Pages/Schedule";
 
 function App() {
   const { isLogged, userType } = useAuth();
@@ -48,9 +49,10 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/" element={<HomePage />} />
             <Route path="/register" element={<RegistrationForm />} />
-            <Route path="/schedule" element={<ScheduleAppointment />} />
+            <Route path="/schedule" element={<Schedule/>} />
             <Route path="/contact" element={<ContactUs />} />
             <Route path="/about" element={<AboutUs />} />
+            <Route path="/our-strategy" element={<Strategys />} />
           </>
         ) : (
           // Private Routes

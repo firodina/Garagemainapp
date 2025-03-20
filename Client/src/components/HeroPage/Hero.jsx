@@ -5,7 +5,7 @@ const Hero = () => {
   // Array of banner images
   const images = [
     "../../assets/img/banner/10002.jpg",
-    "../../assets/img/banner/10001.jpg",
+    "../../assets/abe/4c79f534-14ed-468e-855c-d77fd556af30 (1).jpg",
     "../../assets/img/banner/10006.jpg",
   ];
 
@@ -59,9 +59,6 @@ const Hero = () => {
         <div className="container">
           <div className="row justify-content-center  text-center">
             <div className="col-lg-8">
-              <h6 className="slide-sub-title">
-                // Any kind of car you will get //
-              </h6>
               <h1 className="slide-title">
                 Professional Car <br /> Service Provider
               </h1>

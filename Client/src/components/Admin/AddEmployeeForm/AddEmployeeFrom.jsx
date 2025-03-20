@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Modal, Button, Alert, Form, Row, Col } from "react-bootstrap";
 import employeeService from "../../../Service/employee.service";
-// import { useAuth } from "../../../../Contexts/AuthContext";
+import { useAuth } from "../../../Contexts/AuthContext";
 import "./AddEmployee.css";
 
 function AddEmployeeForm() {
@@ -23,8 +23,8 @@ function AddEmployeeForm() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
 
-  // const { employee } = useAuth();
-  // const loggedInEmployeeToken = employee?.employee_token || "";
+  const { employee } = useAuth();
+  const loggedInEmployeeToken = employee?.employee_token || "";
 
   const handleImageChange = (event) => {
     setEmployeeImage(event.target.files[0]);
@@ -100,7 +100,7 @@ function AddEmployeeForm() {
     try {
       const data = await employeeService.createEmployee(
         formData,
-        // loggedInEmployeeToken
+        loggedInEmployeeToken
       );
       if (data.error) {
         setServerError(data.error);

@@ -6,26 +6,39 @@ const employeeService = require("../services/employee.service");
 const createEmployee = async (req, res) => {
   console.log("Received request body:", req.body); // Log request body
 
+  // Check if the required fields are present
   if (!req.body.employee_email) {
     console.log("Error: employee_email is undefined!");
     return res.status(400).json({ error: "Missing required field: employee_email" });
   }
 
-  try {
-    const employeeExists = await employeeService.checkIfEmployeeExists(req.body.employee_email);
+  // Log the incoming file details
+  if (req.file) {
+    console.log("Uploaded file details:", req.file);
+  } else {
+    console.log("No file uploaded!");
+  }
 
+  try {
+    // Check if the employee already exists
+    const employeeExists = await employeeService.checkIfEmployeeExists(req.body.employee_email);
+    
     if (employeeExists) {
       return res.status(400).json({
         error: "This email address is already associated with another employee!",
       });
     }
 
+    // Create the path for the uploaded image
     const employeeImage = req.file ? `/uploads/${req.file.filename}` : null;
+
+    // Log the employee image path
+    console.log("Employee Image Path:", employeeImage);
 
     const row1 = [
       req.body.employee_email,
       req.body.active_employee,
-      employeeImage, // Path to the uploaded image
+      employeeImage, // Pass the image path
     ];
     const row2 = [
       req.body.employee_first_name,
@@ -35,27 +48,28 @@ const createEmployee = async (req, res) => {
     const row3 = [req.body.company_role_id];
     const employeePassword = req.body.employee_password;
 
+    // Log row data
     console.log("Row1 Data:", row1);
     console.log("Row2 Data:", row2);
     console.log("Row3 Data:", row3);
-    console.log("Employee Password:", employeePassword);
 
+    // Create the employee
     const employee = await employeeService.createEmployee(
-      row1,
+      row1,   // Includes employee_image
       row2,
       row3,
       employeePassword
     );
 
     if (!employee) {
+      console.log("Failed to create employee, invalid data.");
       return res.status(400).json({ error: "Failed to add the employee!" });
-    } else {
-      return res.status(200).json({
-        success: true,
-        message: "Employee added successfully",
-        data: employee,
-      });
     }
+
+    return res.status(200).json({
+      success: true,
+      message: "Employee added successfully",
+    });
   } catch (error) {
     console.error("Server error:", error);
     return res.status(500).json({

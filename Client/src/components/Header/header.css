@@ -12,8 +12,8 @@
 
 /* Top Bar */
 .top-bar {
-  background-color: #f4f7f9; 
-  color: white;
+  /* background-color: #f4f7f9;  */
+  color: red;
 }
 
 .top-bar .container-fluid {
@@ -56,3 +56,6 @@
   .ms-auto button{
   display: inline;
   }
+.link{
+  font-size: 18px;
+}

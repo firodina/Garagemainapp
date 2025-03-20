@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS employee (
   employee_email VARCHAR(255) NOT NULL UNIQUE,
   active_employee BOOLEAN NOT NULL DEFAULT TRUE,
   added_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  employee_image VARCHAR(255) 
+  employee_image VARCHAR(255) NOT NULL
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS employee_info (
@@ -313,8 +313,9 @@ INSERT INTO company_roles (company_role_name) VALUES
 ON DUPLICATE KEY UPDATE company_role_name = company_role_name;
 
 -- Insert Admin
-INSERT INTO employee (employee_email, active_employee, added_date)
-VALUES ('admin@admins.com', 1, CURRENT_TIMESTAMP);
+-- Insert Admin
+INSERT INTO employee (employee_email, active_employee, added_date, employee_image)
+VALUES ('admin@admins.com', 1, CURRENT_TIMESTAMP, 'https://media.istockphoto.com/id/1399565382/photo/young-happy-mixed-race-businessman-standing-with-his-arms-crossed-working-alone-in-an-office.jpg?s=612x612&w=0&k=20&c=buXwOYjA_tjt2O3-kcSKqkTp2lxKWJJ_Ttx2PhYe3VM=');
 
 SET @admin_id = LAST_INSERT_ID();
 
@@ -328,8 +329,8 @@ INSERT INTO employee_role (employee_id, company_role_id)
 VALUES (@admin_id, 3); 
 
 -- Insert Manager
-INSERT INTO employee (employee_email, active_employee, added_date)
-VALUES ('manager@manager.com', 1, CURRENT_TIMESTAMP);
+INSERT INTO employee (employee_email, active_employee, added_date, employee_image)
+VALUES ('manager@manager.com', 1, CURRENT_TIMESTAMP, 'https://media.istockphoto.com/id/1399565382/photo/young-happy-mixed-race-businessman-standing-with-his-arms-crossed-working-alone-in-an-office.jpg?s=612x612&w=0&k=20&c=buXwOYjA_tjt2O3-kcSKqkTp2lxKWJJ_Ttx2PhYe3VM=');
 
 SET @manager_id = LAST_INSERT_ID();
 
