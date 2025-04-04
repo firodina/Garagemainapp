@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 :-webkit-scrollbar {
   width: 12px; /* Width of the scrollbar */
 }
@@ -41,7 +43,7 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: #272626;
+  background-color:#f1f1f1;
 }
 
 main {
@@ -51,4 +53,11 @@ main {
 footer {
   margin-top: auto;
 }
+ a:visited, a:hover, a:active {
+  text-decoration: none !important;
+  background-color: transparent !important;
+  color: inherit !important;
+}
+
+
 

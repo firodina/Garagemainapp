@@ -1,85 +1,108 @@
+/* Custom Footer Styling */
 .footer {
   background-color: #141619;
-  color: white;
+  color: hwb(0 2% 96%);
   display: flex;
   flex-wrap: wrap;
   padding: 40px 20px;
   justify-content: space-between;
   align-items: flex-start;
-  border-top: 3px solid #0d6efd;
+  border-top: 3px solid red;
   box-shadow: 0px -5px 15px rgba(0, 0, 0, 0.3);
 }
 
-.footer-logo-section {
-  flex: 1;
-  min-width: 200px;
-  margin: 10px;
-  text-align: center;
-}
-
-.footer-logo {
-  width: 100px;
-  margin-bottom: 20px;
-}
-
-.footer-section {
-  flex: 1;
-  min-width: 200px;
-  margin: 10px;
-}
-
-.footer-section h5 {
-  color: #0d6efd;
-  margin-bottom: 15px;
-  font-size: 18px;
-  /* position: relative; */
-}
-
-.footer-section h5::after {
-  content: "";
-  display: block;
-  width: 40px;
-  height: 2px;
-  background-color: #0d6efd;
-  margin-top: 5px;
-}
-
-.footer-section ul {
+.schedule-list {
   list-style: none;
   padding: 0;
   font-size: 16px;
 }
 
-.footer-section ul li {
+.schedule-list li {
   margin-bottom: 10px;
 }
 
-.footer-section ul li a {
-  color: white;
+.schedule-list li span {
+  font-weight: bold;
+  color: #fd2d0d;
+}
+
+/* Services Section Styles */
+.service-list {
+  list-style: none;
+  padding: 0;
+}
+
+.service-list li {
+  margin-bottom: 31px;
+}
+
+.service-list li a {
+  color: rgb(12, 9, 9);
   text-decoration: none;
   transition: color 0.3s ease;
 }
 
-.footer-section ul li a:hover {
-  color: #0d6efd;
+.service-list li a:hover {
+  color: #97baed;
   text-decoration: underline;
 }
 
-.social-icons {
-  margin-top: 20px;
+/* Footer Links Styling */
+.footer-links li a {
+  color: rgb(9, 6, 6);
+  text-decoration: none;
+  font-size: 14px;
 }
 
+.footer-links li a:hover {
+  color: #97baed;
+  text-decoration: underline;
+}
+
+.footer-links {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-links li {
+  margin-right: 15px;
+}
+
+/* Social Icons */
 .social-icons a {
-  color: white;
+  color: rgb(11, 7, 7);
   margin: 0 10px;
   font-size: 20px;
   transition: transform 0.3s ease, color 0.3s ease;
 }
 
 .social-icons a:hover {
-  color: #0d6efd;
+  color: #fd450d;
   transform: scale(1.2);
 }
+
 .footer-space {
   padding-bottom: 150px; /* Adjust based on footer height */
+}
+
+/* Footer Logo Section */
+.footer-logo-section img {
+  width: 120px;
+}
+
+/* Button Styling */
+a:hover {
+  background-color:red;
+}
+
+/* Footer Terms Section */
+.footer-link {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgb(21, 14, 14);
+}
+
+.footer-link:hover {
+  color:red;
+  text-decoration: underline;
 }

@@ -1,49 +1,64 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import { FaMapMarkerAlt } from "react-icons/fa";
-import car from "../../assets/img/home-demos/home-8.jpg";
-import "./location.css";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 
 function Location() {
-  return (
-    <section className="locations">
-      <Container>
-        <h1 className="text-uppercase text_blue">Our Locations</h1>
+  // Orbis Trading And Technical Center Share Company location (latitude, longitude)
+  const companyLocation = {
+    lat: 9.03,  // Replace with the actual latitude of the company
+    lng: 38.74, // Replace with the actual longitude of the company
+  };
 
-        <Row className="justify-content-center align-items-center mt-4">
-          <Col md={6}>
-            <div className="location-list">
-              <div className="location animated fadeInUp">
-                <FaMapMarkerAlt size={20} className="location-icon" />
+  const mapRef = useRef(null);  // Ref to store the map instance
+
+  useEffect(() => {
+    if (!mapRef.current) {
+      // Initialize the map only if it's not already initialized
+      const map = L.map("map").setView([companyLocation.lat, companyLocation.lng], 13);
+
+      // Add the tile layer for the map
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      }).addTo(map);
+
+      // Add a marker for the company location
+      L.marker([companyLocation.lat, companyLocation.lng]).addTo(map)
+        .bindPopup("Orbis Trading And Technical Center Share Company")
+        .openPopup();
+
+      // Store map instance in ref
+      mapRef.current = map;
+    }
+  }, []); // Empty dependency array ensures the effect runs once
+
+  return (
+    <section className="bg-gray-100 py-16 px-6">
+      <Container>
+        <h1 className="text-3xl font-bold text-blue-600 text-center uppercase">Our Locations</h1>
+
+        <Row className="justify-center items-center mt-8">
+           {/* Map */}
+           <Col md={12} className="text-center mt-8 md:mt-0">
+            <div id="map" className="w-full h-96 rounded-lg shadow-lg transition-all transform duration-700 ease-in-out"></div>
+          </Col>
+          {/* Text and Location vertically */}
+          <Col md={12} className="d-flex flex-column justify-center ">
+            <div className="space-y-8">
+              <div className="flex items-center bg-gray-20 p-6 rounded-lg ">
+                <FaMapMarkerAlt size={20} className="text-red-600 mr-4" />
                 <div className="location-text">
-                  <h4>Auto Care Garage ADDIS ABABA</h4>
-                  <p>Bole Street, Wareda 05, FL 33125</p>
-                </div>
-              </div>
-              <div className="location animated fadeInUp delay-1s">
-                <FaMapMarkerAlt size={20} className="location-icon" />
-                <div className="location-text">
-                  <h4>Auto Care Garage ADDIS ABABA</h4>
-                  <p>Bole Street, Wareda 05, FL 33125</p>
-                </div>
-              </div>
-              <div className="location animated fadeInUp delay-2s">
-                <FaMapMarkerAlt size={20} className="location-icon" />
-                <div className="location-text">
-                  <h4>Auto Care Garage ADDIS ABABA</h4>
-                  <p>Bole Street, Wareda 05, FL 33125</p>
+                  <h4 className="text-lg font-semibold text-gray-800">Orbis Trading And Technical Center</h4>
+                  <p className="text-gray-600 text-sm">Addis Ababa, Ethiopia</p>
                 </div>
               </div>
             </div>
           </Col>
-          <Col md={6} className="illustration animated fadeIn">
-            <img
-              src={car}
-              alt="Car Repair Illustration"
-              className="img-fluid"
-            />
-          </Col>
+
+         
         </Row>
+
       </Container>
     </section>
   );

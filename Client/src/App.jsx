@@ -8,8 +8,6 @@ import HomePage from "./Pages/HomePage";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "./Assets/css/font-icons.css";
-import "./Assets/sass/style.scss";
-import "./Assets/sass/elements/_button.scss";
 import Login from "./components/Login/Login";
 import Footer from "./components/Footer/Footer";
 import RegistrationForm from "./components/Register/Register";
@@ -35,6 +33,7 @@ import Orders from "./Pages/admin/ViewOrder";
 import PrivateAuthRoute from "./components/Auth/PrivateAythRoute"; // Import your PrivateAuthRoute component
 import Strategys from "./Pages/Strategys";
 import Schedule from "./Pages/Schedule";
+import ServicePage from "./Pages/ServicePage/ServicePage";
 
 function App() {
   const { isLogged, userType } = useAuth();
@@ -53,6 +52,7 @@ function App() {
             <Route path="/contact" element={<ContactUs />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/our-strategy" element={<Strategys />} />
+            <Route path="/service" element={<ServicePage />} />
           </>
         ) : (
           // Private Routes
