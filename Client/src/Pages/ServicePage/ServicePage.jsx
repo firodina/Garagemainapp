@@ -4,7 +4,7 @@ import img1 from "../../assets/img/banner/10006.jpg";
 import img4 from "../../assets/img/banner/MOENCO_HEAD_OFFICE-3502-1536x1024.jpg";
 import img6 from "../../assets/img/banner/MOENCO-ADAMA-4971-1536x1024.jpg";
 import img3 from "../../assets/img/banner/moenco-last-shoots-4830-1536x1024.jpg";
-
+import { Link } from "react-router-dom"
 
 
 function ServicePage() {
@@ -54,6 +54,17 @@ function ServicePage() {
               <h1 className="section-title text-white text-5xl font-semibold">
                 WHAT WE DO
               </h1>
+              <span className="inline-block">
+                <Link
+                  to="/schedule"
+                  className="inline-flex items-center px-6 py-3 border-0 bg-red-600 !text-white font-semibold rounded-full hover:bg-red-700 transition duration-300 !no-underline"
+                >
+                  Service Booking
+                  <i className="fa fa-arrow-right ml-2"></i>
+                </Link>
+
+              </span>
+
             </div>
 
           </div>
@@ -174,39 +185,39 @@ function ServicePage() {
 
       {/* section 4 */}
       <section class="bg-gray-100 py-12 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-    
-    <div>
-      <h2 class="text-2xl sm:text-3xl lg:text-4xl !text-red-600 font-semibold mb-4">
-        General Repair
-      </h2>
-      <div class="text-gray-700 text-base sm:text-sm lg:text-base space-y-4 leading-relaxed">
-        <p>
-          We are dedicated to providing comprehensive service to extend the life of your vehicle,
-          regardless of wear and tear. General repair includes diagnosing all faults or malfunctions
-          and fixing them right the first time to retain your car's original condition.
-        </p>
-        <p>
-          Our highly skilled technicians, supported by the latest diagnostic equipment and technology,
-          are ready to give you peace of mind. From small malfunctions to major faults, we make sure
-          everything is diagnosed and resolved accurately.
-        </p>
-      </div>
-    </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
 
-    <div>
-      <img
-        src={img3}
-        alt="Toyota Service Center Ethiopia"
-        class="w-full h-auto rounded-xl shadow-lg"
-      />
-    </div>
-    
-  </div>
-</section>
+          <div>
+            <h2 class="text-2xl sm:text-3xl lg:text-4xl !text-red-600 font-semibold mb-4">
+              General Repair
+            </h2>
+            <div class="text-gray-700 text-base sm:text-sm lg:text-base space-y-4 leading-relaxed">
+              <p>
+                We are dedicated to providing comprehensive service to extend the life of your vehicle,
+                regardless of wear and tear. General repair includes diagnosing all faults or malfunctions
+                and fixing them right the first time to retain your car's original condition.
+              </p>
+              <p>
+                Our highly skilled technicians, supported by the latest diagnostic equipment and technology,
+                are ready to give you peace of mind. From small malfunctions to major faults, we make sure
+                everything is diagnosed and resolved accurately.
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <img
+              src={img3}
+              alt="Toyota Service Center Ethiopia"
+              class="w-full h-auto rounded-xl shadow-lg"
+            />
+          </div>
+
+        </div>
+      </section>
 
 
-{/* import React from "react";
+      {/* import React from "react";
 
 const ServiceAdSection = ({ title, image, paragraphs = [], reverse = false }) => {
   return (

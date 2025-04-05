@@ -5,23 +5,15 @@ import "./footer.css";
 
 function Footer() {
   return (
-    <footer className="!bg-gray-300 text-black py-12 px-6 ">
+    <footer className="bg-gray-300 text-black py-12 px-6">
       <div className="container mx-auto flex flex-wrap justify-between items-start">
         
         {/* Time Schedule Section */}
         <div className="w-full md:w-1/3 p-6">
-          <h6 className="!text-black-400 uppercase text-lg mb-3">Time Schedule</h6>
+          <h6 className="text-black-400 uppercase text-lg mb-3">Time Schedule</h6>
           <h4 className="text-xl font-semibold mb-6">Our Working Hours</h4>
           <ul className="schedule-list space-y-3">
-            {[
-              "Monday",
-              "Tuesday",
-              "Wednesday",
-              "Thursday",
-              "Friday",
-              "Saturday",
-              "Sunday",
-            ].map((day, index) => (
+            {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day, index) => (
               <li key={index} className="flex justify-between text-sm">
                 {day} <span>{day === "Sunday" ? "Official Holiday" : "07:00AM - 12:00PM"}</span>
               </li>
@@ -31,7 +23,7 @@ function Footer() {
 
         {/* Services Section */}
         <div className="w-full md:w-1/3 p-6">
-          <h4 className="text-xl font-semibold !text-black-400 mb-6">Our Services</h4>
+          <h4 className="text-xl font-semibold text-black-400 mb-6">Our Services</h4>
           <div className="flex flex-wrap justify-between">
             <ul className="service-list space-y-9 text-sm w-1/2 mb-9">
               {[
@@ -72,11 +64,12 @@ function Footer() {
           </div>
         </div>
 
-        {/* Button to Scroll to Appointment Scheduling (Centered vertically) */}
-        <div className="w-full md:w-auto flex justify-center items-center mt-8 md:mt-58">
+        {/* Button to Scroll to Appointment Scheduling */}
+        <div className="w-full md:w-auto flex justify-center items-center mt-8 md:mt-0 lg:mt-70">
           <a
             href="#appointment"
-            className="py-3 px-6 !bg-red-600 !text-white font-semibold rounded-md hover:bg-blue-700 transition duration-300 no-underline hover:no-underline" style={{ textDecoration: "none" }}
+            className="py-3 px-6 bg-red-600 text-white font-semibold rounded-md hover:bg-blue-700 transition duration-300 no-underline hover:no-underline"
+            style={{ textDecoration: "none" }}
           >
             Schedule an Appointment
           </a>
