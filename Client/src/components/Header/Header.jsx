@@ -45,9 +45,8 @@ function Header() {
                 <Dropdown.Menu className="bg-gray-100">
                 <Dropdown.Item onClick={() => navigate("/service")}>Quality Service</Dropdown.Item>
                   <Dropdown.Item onClick={() => navigate("/schedule")}>Online Booking</Dropdown.Item>
-                  <Dropdown.Item onClick={() => navigate("/car-washing")}>Car Washing</Dropdown.Item>
-                  <Dropdown.Item onClick={() => navigate("/car-painting")}>Car Painting</Dropdown.Item>
-                  <Dropdown.Item onClick={() => navigate("/maintenance")}>Maintenance</Dropdown.Item>
+                  <Dropdown.Item onClick={() => navigate("/maintenance")}>Body Painting and Maintenance</Dropdown.Item>
+                  <Dropdown.Item onClick={() => navigate("/HtoH")}>House to House request </Dropdown.Item>
                 </Dropdown.Menu>
               </Dropdown>
               

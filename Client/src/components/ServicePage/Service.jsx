@@ -28,7 +28,8 @@ function Service() {
           Our Best <span className="text-red-500">Services</span>
         </h2>
         <p className="text-gray-800 max-w-2xl mx-auto mt-3">
-          We are dedicated to providing comprehensive service to extend the life of your vehicle irrespective of wear and tear.
+          We are dedicated to providing comprehensive service to extend the life of
+           your vehicle irrespective of wear and tear.
         </p>
       </div>
 

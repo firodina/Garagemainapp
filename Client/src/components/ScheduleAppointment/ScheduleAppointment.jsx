@@ -1,95 +1,110 @@
-// ScheduleAppointment.js
 import React from "react";
-import { Form, Button, Container, Row, Col } from "react-bootstrap";
-import myImage from '../../assets/img/img-slide/factory-scheduled-maintenance-1024x576.webp';
-// import "./ScheduleAppointment.css"; // Import the CSS file
+import img9 from "../../assets/img/banner/10006.jpg";
 
 function ScheduleAppointment() {
   return (
-    <Container fluid className="schedule-container d-flex justify-content-center align-items-center mt-5" >
-      <Row className="w-100">
-        {/* Left Image Section */}
-        <Col md={6} className="d-none d-md-block">
-          <div
-            className="left-image"
-            style={{
-              backgroundImage: `url(${myImage})`, // Replace with your image path
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              height: "100%"
-            }}
-          ></div>
-        </Col>
-
-        {/* Form Section */}
-        <Col md={6} className="d-flex justify-content-center align-items-center p-0">
-          <div className="form-wrapper p-4 bg-light rounded shadow">
-            <h2 className="text-center mb-4">Schedule Appointment</h2>
-            <Form>
-              <Row>
-                <Col md={6} className="mb-3">
-                  <Form.Control type="text" placeholder="First name" />
-                </Col>
-                <Col md={6} className="mb-3">
-                  <Form.Control type="text" placeholder="Last name" />
-                </Col>
-              </Row>
-              <Row>
-                <Col md={6} className="mb-3">
-                  <Form.Control type="email" placeholder="Email address" />
-                </Col>
-                <Col md={6} className="mb-3">
-                  <Form.Control type="text" placeholder="Phone number" />
-                </Col>
-              </Row>
-              <Row>
-                <Col md={4} className="mb-3">
-                  <Form.Control as="select">
-                    <option>Select Make</option>
-                    {/* Dynamically populate vehicle makes */}
-                    <option>Toyota</option>
-                    <option>Honda</option>
-                    <option>Ford</option>
-                  </Form.Control>
-                </Col>
-                <Col md={4} className="mb-3">
-                  <Form.Control as="select">
-                    <option>Select Model</option>
-                    {/* Dynamically populate vehicle models */}
-                    <option>Corolla</option>
-                    <option>Civic</option>
-                    <option>Mustang</option>
-                  </Form.Control>
-                </Col>
-                <Col md={4} className="mb-3">
-                  <Form.Control type="text" placeholder="Year" />
-                </Col>
-              </Row>
-              <Form.Group className="mb-3">
-                <Form.Control
-                  as="textarea"
-                  placeholder="Enter service details"
-                  rows={2}
-                />
-              </Form.Group>
-              <Row>
-                <Col md={6} className="mb-3">
-                  <Form.Control type="text" placeholder="mm/dd/yyyy" />
-                </Col>
-                <Col md={6} className="mb-3">
-                  <Form.Control type="text" placeholder="--:-- --" />
-                </Col>
-              </Row>
-              <div className="d-grid">
-                <Button variant="danger" type="submit">
-                  Submit Now
-                </Button>
-              </div>
-            </Form>
+    <>
+      {/* Fixed Banner */}
+      <div
+        className="ltn__breadcrumb-area ltn__breadcrumb-area-2 ltn__breadcrumb-color-white"
+        style={{
+          backgroundImage: `url(${img9})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          position: "fixed", // Changed to 'fixed' to keep the image fixed
+          top: 70,
+          left: 0,
+          width: "100%",
+          height: "400px",
+          zIndex: -1, // Makes sure the image stays behind the form
+        }}
+      >
+        <div className="container mx-auto px-6 py-16">
+          <div className="flex flex-wrap justify-between items-center">
+            <div className="section-title-area ltn__section-title-2">
+              <h6 className="section-subtitle text-gray-700 uppercase !text-lg mb-6">
+                // Welcome to our company
+              </h6>
+            </div>
           </div>
-        </Col>
-      </Row>
-    </Container>
+        </div>
+      </div>
+
+      {/* Form Section */}
+      <div className="py-12 px-6 bg-gray-100 min-h-screen mt-96"> {/* Add margin-top to push the form down */}
+        <h2 className="text-3xl font-semibold text-center mb-6">
+          Online Service Booking
+        </h2>
+        <form className="max-w-5xl mx-auto space-y-4">
+          <div className="flex flex-wrap gap-4">
+            <input
+              type="text"
+              placeholder="First name"
+              className="flex-1 p-3 border border-gray-300 rounded w-full md:w-[48%]"
+            />
+            <input
+              type="text"
+              placeholder="Last name"
+              className="flex-1 p-3 border border-gray-300 rounded w-full md:w-[48%]"
+            />
+          </div>
+          <div className="flex flex-wrap gap-4">
+            <input
+              type="email"
+              placeholder="Email address"
+              className="flex-1 p-3 border border-gray-300 rounded w-full md:w-[48%]"
+            />
+            <input
+              type="text"
+              placeholder="Phone number"
+              className="flex-1 p-3 border border-gray-300 rounded w-full md:w-[48%]"
+            />
+          </div>
+          <div className="flex flex-wrap gap-4">
+            <select className="flex-1 p-3 border border-gray-300 rounded w-full md:w-[32%]">
+              <option>Select Make</option>
+              <option>Toyota</option>
+              <option>Honda</option>
+              <option>Ford</option>
+            </select>
+            <select className="flex-1 p-3 border border-gray-300 rounded w-full md:w-[32%]">
+              <option>Select Model</option>
+              <option>Corolla</option>
+              <option>Civic</option>
+              <option>Mustang</option>
+            </select>
+            <input
+              type="text"
+              placeholder="Year"
+              className="flex-1 p-3 border border-gray-300 rounded w-full md:w-[32%]"
+            />
+          </div>
+          <textarea
+            rows="2"
+            placeholder="Enter service details"
+            className="w-full p-3 border border-gray-300 rounded"
+          ></textarea>
+          <div className="flex flex-wrap gap-4">
+            <input
+              type="text"
+              placeholder="mm/dd/yyyy"
+              className="flex-1 p-3 border border-gray-300 rounded w-full md:w-[48%]"
+            />
+            <input
+              type="text"
+              placeholder="--:-- --"
+              className="flex-1 p-3 border border-gray-300 rounded w-full md:w-[48%]"
+            />
+          </div>
+          <button
+            type="submit"
+            className="w-full bg-red-500 text-white py-3 rounded hover:bg-red-600"
+          >
+            Submit Now
+          </button>
+        </form>
+      </div>
+    </>
   );
 }
 

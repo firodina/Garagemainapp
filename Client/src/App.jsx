@@ -11,7 +11,6 @@ import "./Assets/css/font-icons.css";
 import Login from "./components/Login/Login";
 import Footer from "./components/Footer/Footer";
 import RegistrationForm from "./components/Register/Register";
-import ContactUs from "./components/ContactUs/ContactUs";
 import AdminDashbord from "./Pages/admin/AdminDashBoard";
 import AddEmployee from "./Pages/admin/AddEmployee";
 import MyHistory from "./Pages/Customer/MyHistory/MyHistory";
@@ -34,6 +33,9 @@ import PrivateAuthRoute from "./components/Auth/PrivateAythRoute"; // Import you
 import Strategys from "./Pages/Strategys";
 import Schedule from "./Pages/Schedule";
 import ServicePage from "./Pages/ServicePage/ServicePage";
+import ContactUsPage from "./Pages/ContactUsPage/ContactUsPage";
+import Maintenance from "./Pages/Maintenance/Maintenance";
+import HtoH from "./Pages/HouseToHouse/HtoH";
 
 function App() {
   const { isLogged, userType } = useAuth();
@@ -49,10 +51,12 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/register" element={<RegistrationForm />} />
             <Route path="/schedule" element={<Schedule/>} />
-            <Route path="/contact" element={<ContactUs />} />
+            <Route path="/contact" element={<ContactUsPage />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/our-strategy" element={<Strategys />} />
             <Route path="/service" element={<ServicePage />} />
+            <Route path="/maintenance" element={<Maintenance/>} />
+            <Route path="/HtoH" element={<HtoH/>} />
           </>
         ) : (
           // Private Routes
