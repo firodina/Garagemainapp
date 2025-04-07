@@ -53,10 +53,10 @@ function Header() {
               <Link to="/contact" className="nav-link text-red-600 font-bold">Contact Us</Link>
             </Nav>
           </Navbar.Collapse>
-          <div className="ml-auto">
+          <div className="ml-auto ">
             {isLogged ? (
               <Dropdown align="end">
-                <Dropdown.Toggle variant="link" id="dropdown-avatar" className="text-red-600">
+                <Dropdown.Toggle variant="link" id="dropdown-avatar" className="text-red-600 ">
                   <FaUserCircle size={30} />
                 </Dropdown.Toggle>
                 <Dropdown.Menu className="bg-gray-100">
@@ -64,7 +64,7 @@ function Header() {
                     <FaEdit className="mr-2" /> Edit Profile
                   </Dropdown.Item>
                   <Dropdown.Divider />
-                  <Dropdown.Item onClick={handleLogout} className="flex items-center text-red-600">
+                  <Dropdown.Item onClick={handleLogout} className="flex items-center text-red-600 ">
                     Logout
                   </Dropdown.Item>
                 </Dropdown.Menu>

@@ -42,61 +42,68 @@ function App() {
 
   return (
     <>
-      <Header />
-      <Routes>
-        {/* Public Routes */}
-        {!isLogged ? (
-          <>
-            <Route path="/login" element={<Login />} />
-            <Route path="/" element={<HomePage />} />
-            <Route path="/register" element={<RegistrationForm />} />
-            <Route path="/schedule" element={<Schedule/>} />
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-grow">
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/schedule" element={<Schedule />} />
             <Route path="/contact" element={<ContactUsPage />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/our-strategy" element={<Strategys />} />
             <Route path="/service" element={<ServicePage />} />
-            <Route path="/maintenance" element={<Maintenance/>} />
-            <Route path="/HtoH" element={<HtoH/>} />
-          </>
-        ) : (
-          // Private Routes
-          <Route element={<PrivateAuthRoute />}>
-            {userType === 3 ? (
-              // Admin Routes
+            <Route path="/maintenance" element={<Maintenance />} />
+            <Route path="/HtoH" element={<HtoH />} />
+            {!isLogged ? (
               <>
-                <Route path="/" element={<Navigate to="/admin" />} />
-                <Route path="/admin" element={<AdminDashbord />} />
-                <Route path="/admin/add-employee" element={<AddEmployee />} />
-                <Route path="/admin/services/add" element={<AddService />} />
-                <Route path="/admin/add_customer" element={<Addcustomer />} />
-                <Route path="/admin/customers" element={<Customers />} />
-                <Route path="/admin/employees" element={<Employees />} />
-                <Route path="/admin/services/view" element={<ViewServices />} />
-                <Route path="/admin/orders" element={<Orders />} />
-              </>
-            ) : userType === 1 ? (
-              // Employee Routes
-              <>
-                <Route path="/" element={<Navigate to="/employee" />} />
-                <Route path="/employee" element={<EmployeeDash />} />
-                <Route path="/employee/tasks" element={<EmployeeTasks />} />
-                <Route path="/employee/profile" element={<EmployeePofile />} />
-                <Route path="/employee/settings" element={<EmployeSetting />} />
-                <Route path="/employee/task-history" element={<TaskHistory />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/" element={<HomePage />} />
+                <Route path="/register" element={<RegistrationForm />} />
+
               </>
             ) : (
-              // Customer Routes
-              <>
-                <Route path="/customer" element={<CustomerDash />} />
-                <Route path="/customer/orders" element={<MyOrderList />} />
-                <Route path="/customer/history" element={<MyHistory />} />
-                <Route path="/customer/profile" element={<MyProfileList />} />
-              </>
+              // Private Routes
+              <Route element={<PrivateAuthRoute />}>
+                {userType === 3 ? (
+                  // Admin Routes
+                  <>
+                    <Route path="/" element={<Navigate to="/admin" />} />
+                    <Route path="/admin" element={<AdminDashbord />} />
+                    <Route path="/admin/add-employee" element={<AddEmployee />} />
+                    <Route path="/admin/services/add" element={<AddService />} />
+                    <Route path="/admin/add_customer" element={<Addcustomer />} />
+                    <Route path="/admin/customers" element={<Customers />} />
+                    <Route path="/admin/employees" element={<Employees />} />
+                    <Route path="/admin/services/view" element={<ViewServices />} />
+                    <Route path="/admin/orders" element={<Orders />} />
+                  </>
+                ) : userType === 1 ? (
+                  // Employee Routes
+                  <>
+                    <Route path="/" element={<Navigate to="/employee" />} />
+                    <Route path="/employee" element={<EmployeeDash />} />
+                    <Route path="/employee/tasks" element={<EmployeeTasks />} />
+                    <Route path="/employee/profile" element={<EmployeePofile />} />
+                    <Route path="/employee/settings" element={<EmployeSetting />} />
+                    <Route path="/employee/task-history" element={<TaskHistory />} />
+                  </>
+                ) : (
+                  // Customer Routes
+                  <>
+                    <Route path="/customer" element={<CustomerDash />} />
+                    <Route path="/customer/orders" element={<MyOrderList />} />
+                    <Route path="/customer/history" element={<MyHistory />} />
+                    <Route path="/customer/profile" element={<MyProfileList />} />
+                  </>
+                )}
+              </Route>
             )}
-          </Route>
-        )}
-      </Routes>
-      <Footer />
+          </Routes>
+        </main>
+        {/* Footer */}
+        <Footer />
+
+      </div>
     </>
   );
 }

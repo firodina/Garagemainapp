@@ -51,7 +51,7 @@
   
   .form-group input:focus,
   .form-group select:focus {
-    border-color: #007bff;
+    /* border-color: #ff1e00; */
     outline: none;
     box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.25); /* Bootstrap-like focus shadow */
   }
@@ -76,7 +76,7 @@
   
   /* Buttons */
   .theme-btn {
-    background-color: #007bff;
+    /* background-color: #ff1900; */
     border: none;
     color: #fff;
     padding: 0.75rem;
@@ -87,7 +87,7 @@
   }
   
   .theme-btn:hover {
-    background-color: #0056b3;
+    /* background-color:  #ff1900; */
   }
   
   /* Spinner Container */
@@ -104,7 +104,7 @@
   .image-placeholder {
     width: 120px;
     height: 120px;
-    border: 2px dashed #007bff;
+    /* border: 2px dashed  #ff1900; */
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -116,7 +116,7 @@
   
   .upload-icon {
     font-size: 2rem;
-    color: #007bff;
+    color:  #ff1900;
   }
   
   .image-preview {
@@ -142,17 +142,17 @@
   }
   /* Border Color for Form Controls */
   .form-control {
-    border: 1px solid #007bff; /* Default border color */
+    /* border: 1px solid  #ff1900; Default border color */
     transition: border-color 0.2s ease-in-out; /* Smooth transition */
   }
   
   .form-control:focus {
-    border-color: #0056b3; /* Darker blue on focus */
+    /* border-color:  #ff1900; Darker blue on focus */
     box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.25); /* Focus shadow */
   }
   
   .form-control.is-invalid {
-    border-color: #dc3545; /* Red border color for invalid input */
+    /* border-color: #dc3545; Red border color for invalid input */
     box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25); /* Red focus shadow */
   }
   
@@ -168,7 +168,7 @@
   .image-placeholder {
     width: 120px;
     height: 120px;
-    border: 2px dashed #007bff;
+    /* border: 2px dashed  #ff1900; */
     border-radius: 50%;
     background-color: #f8f9fa;
     display: flex;
@@ -179,7 +179,7 @@
   
   .upload-icon {
     font-size: 2rem;
-    color: #007bff;
+    /* color:  #ff1900; */
   }
   
   .image-preview {
