@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+// import { Link } from "react-router-dom";
 import {
   Table,
   Button,
@@ -139,12 +140,10 @@ const EmployeesList = () => {
     );
     printWindow.document.write(
       `<h1>Employee ID</h1>
-      <p><strong>Full Name:</strong> ${currentEmployee.employee_first_name} ${
-        currentEmployee.employee_last_name
+      <p><strong>Full Name:</strong> ${currentEmployee.employee_first_name} ${currentEmployee.employee_last_name
       }</p>
       <p><strong>Email:</strong> ${currentEmployee.employee_email}</p>
-      <p><strong>Role:</strong> ${
-        roleLabels[currentEmployee.company_role_id]
+      <p><strong>Role:</strong> ${roleLabels[currentEmployee.company_role_id]
       }</p>
       <p><strong>Phone Number:</strong> ${currentEmployee.employee_phone}</p>
       <p><strong>Added Date:</strong> ${format(
@@ -308,11 +307,11 @@ const EmployeesList = () => {
           <Alert.Heading>Error</Alert.Heading>
           <p>{apiErrorMessage}</p>
         </Alert>
-       )} 
+      )}
 
       {loading ? (
         <Spinner animation="border" />
-      ) : ( 
+      ) : (
         <>
           <div className="title-container">
             <h1 className="title">Employee List</h1>
@@ -340,68 +339,59 @@ const EmployeesList = () => {
               </tr>
             </thead>
             <tbody>
-               {currentEmployees.map((employee) => (
+              {currentEmployees.map((employee) => (
                 <tr key={employee.employee_id}>
                   <td>{employee.employee_first_name}</td>
                   <td>{employee.employee_last_name}</td>
                   <td>{employee.employee_email}</td>
                   <td>{employee.employee_phone}</td>
                   <td>{roleLabels[employee.company_role_id]}</td>
-                  <td>{statusLabels[employee.active_employee]}</td> 
+                  <td>{statusLabels[employee.active_employee]}</td>
 
                   <td>
-                     {isAdmin ? ( 
-                      <>
-                        <Button
-                          variant="warning"
-                          className="me-2"
-                          onClick={() => handleEditClick(employee)}
-                        >
-                          <FaEdit />
-                        </Button>
-                        <Button
-                          variant="danger"
-                          className="me-2"
-                          onClick={() => handleDeleteClick(employee)}
-                        >
-                          <FaTrash />
-                        </Button>
-                      </>
-                     ) : null} 
-                    <OverlayTrigger
-                      trigger="click"
-                      placement="left"
-                      overlay={employeePopover(employee)}
-                    >
-                      <Button variant="info" className="me-2">
-                        <FaEye />
-                      </Button>
-                    </OverlayTrigger>
-                    <Button
-                      variant="secondary"
-                      className="me-2"
-                      onClick={() => handlePrintId(employee)}
-                    >
-                      <FaPrint />
-                    </Button>
-                    <Button
-                      variant="primary"
-                      className="me-2"
-                      onClick={() => {
-                        setCurrentEmployee(employee);
-                        setShowPasswordResetModal(true);
-                      }}
-                    >
-                      <FaKey />
-                    </Button>
+                    <div className="flex items-center gap-3 pr-4">
+                      {isAdmin && (
+                        <>
+                          <button onClick={() => handleEditClick(employee)} className="text-blue-600 hover:text-blue-800">
+                            <FaEdit size={18} />
+                          </button>
+                          <button onClick={() => handleDeleteClick(employee)} className="text-red-600 hover:text-red-800">
+                            <FaTrash size={20} />
+                          </button>
+                        </>
+                      )}
+                      <OverlayTrigger
+                        trigger="click"
+                        placement="left"
+                        overlay={employeePopover(employee)}
+                      >
+                        <button className="text-teal-600 hover:text-teal-800">
+                          <FaEye />
+                        </button>
+                      </OverlayTrigger>
+                      <button onClick={() => handlePrintId(employee)} className="text-gray-600 hover:text-gray-800">
+                        <FaPrint />
+                      </button>
+                      <button
+                        onClick={() => {
+                          setCurrentEmployee(employee);
+                          setShowPasswordResetModal(true);
+                        }}
+                        className="text-yellow-600 hover:text-yellow-800"
+                      >
+                        <FaKey />
+                      </button>
+                    </div>
                   </td>
-                 </tr> 
-               ))} 
+
+
+                </tr>
+              ))}
             </tbody>
           </Table>
 
           <Pagination>
-             {[...Array(totalPages).keys()].map((page) => (
+            {[...Array(totalPages).keys()].map((page) => (
               <Pagination.Item
                 key={page + 1}
                 active={page + 1 === currentPage}
@@ -409,7 +399,7 @@ const EmployeesList = () => {
               >
                 {page + 1}
               </Pagination.Item>
-            ))} 
+            ))}
           </Pagination>
 
           {/* Employee Modal */}
@@ -530,7 +520,7 @@ const EmployeesList = () => {
               >
                 Close
               </Button>
-              <Button variant="primary"  onClick={handleSaveChanges}
+              <Button variant="primary" onClick={handleSaveChanges}
               >
                 Save Changes
               </Button>
@@ -555,8 +545,8 @@ const EmployeesList = () => {
               >
                 Cancel
               </Button>
-              <Button variant="danger"  onClick={handleConfirmDelete} >
-             
+              <Button variant="danger" onClick={handleConfirmDelete} >
+
                 Delete
               </Button>
             </Modal.Footer>
@@ -564,14 +554,14 @@ const EmployeesList = () => {
 
           {/* Print Modal */}
           <Modal >
-           show={showPrintModal} onHide={() => setShowPrintModal(false)} 
+            show={showPrintModal} onHide={() => setShowPrintModal(false)}
             <Modal.Header closeButton>
               <Modal.Title>Print Employee ID</Modal.Title>
             </Modal.Header>
             <Modal.Body>
               <p>
                 Are you sure you want to print the ID for{" "}
-                {currentEmployee?.employee_first_name}{" "} 
+                {currentEmployee?.employee_first_name}{" "}
                 {currentEmployee?.employee_last_name}?
               </p>
             </Modal.Body>
@@ -583,7 +573,7 @@ const EmployeesList = () => {
                 Cancel
               </Button>
               <Button variant="primary" onClick={handleConfirmPrint}  >
-              
+
                 Print
               </Button>
             </Modal.Footer>
@@ -617,8 +607,8 @@ const EmployeesList = () => {
               >
                 Cancel
               </Button>
-              <Button variant="primary"  onClick={handlePasswordReset}>
-  
+              <Button variant="primary" onClick={handlePasswordReset}>
+
                 Reset Password
               </Button>
             </Modal.Footer>
@@ -635,7 +625,7 @@ const EmployeesList = () => {
             <Toast.Body>{toastMessage}</Toast.Body>
           </Toast>
         </>
-       )} 
+      )}
     </div>
   );
 };

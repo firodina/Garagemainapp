@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Pie } from "react-chartjs-2";
-import { Card } from "react-bootstrap";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
-// Register necessary components with ChartJS
+// Register Chart.js components
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const EmployeeStatsChart = () => {
@@ -12,9 +11,7 @@ const EmployeeStatsChart = () => {
   useEffect(() => {
     const fetchEmployeeStats = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:3000/api/employees/stats"
-        );
+        const response = await fetch("http://localhost:3000/api/employees/stats");
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -53,31 +50,13 @@ const EmployeeStatsChart = () => {
     fetchEmployeeStats();
   }, []);
 
-  if (!chartData) {
-    return (
-      <Card
-        style={{
-          backgroundColor: "#fff", // White background
-          borderColor: "#ddd",
-          height: "100vh",
-        }}
-      >
-        <Card.Header as="h5" style={{ color: "#000" }}>
-          Employee Statistics
-        </Card.Header>
-        <Card.Body style={{ height: "100%" }}>Loading...</Card.Body>
-      </Card>
-    );
-  }
-
-  // Options for the chart
   const options = {
     responsive: true,
     plugins: {
       legend: {
         position: "top",
         labels: {
-          color: "#000", // Legend text color changed to black
+          color: "#000",
         },
       },
       tooltip: {
@@ -85,10 +64,7 @@ const EmployeeStatsChart = () => {
           label: function (context) {
             const label = context.label || "";
             const value = context.raw || 0;
-            const total = context.chart.data.datasets[0].data.reduce(
-              (a, b) => a + b,
-              0
-            );
+            const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
             const percentage = ((value / total) * 100).toFixed(2);
             return `${label}: ${value} Employees (${percentage}%)`;
           },
@@ -97,23 +73,24 @@ const EmployeeStatsChart = () => {
     },
   };
 
-  return (
-    <Card
-      style={{
-        backgroundColor: "#fff",
-        borderColor: "#ddd",
-        height: "80vh",
-      }}
-    >
-      <Card.Header as="h5" style={{ color: "#000" }}>
-        Employee Statistics
-      </Card.Header>
-      <Card.Body style={{ height: "80%", paddingBottom: "50px" }}>
-        <div style={{ height: "100%" }}>
-          <Pie data={chartData} options={options} />
+  if (!chartData) {
+    return (
+      <div className="bg-white border border-gray-300 rounded-xl p-6 h-[40vh] shadow-md">
+        <h2 className="text-lg font-semibold text-gray-800 mb-4">Employee Statistics</h2>
+        <div className="flex items-center justify-center  text-gray-500">
+          Loading...
         </div>
-      </Card.Body>
-    </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white border border-gray-300 rounded-xl p-6 h-[80vh] shadow-md">
+      <h2 className="text-lg font-semibold text-gray-800 mb-4">Employee Statistics</h2>
+      <div className="">
+        <Pie data={chartData} options={options} />
+      </div>
+    </div>
   );
 };
 

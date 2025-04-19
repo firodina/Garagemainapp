@@ -7,8 +7,8 @@ const employeeAuthHeader = async () => {
       employee.employee_role = decodedToken.employee_role;
       employee.employee_id = decodedToken.employee_id;
       employee.employee_first_name = decodedToken.employee_first_name;
-      // employee.customer_id = decodedToken.customer_id;
-      // employee.customer_email = decodedToken.customer_email;
+      employee.customer_id = decodedToken.customer_id;
+      employee.customer_email = decodedToken.customer_email;
       return employee;
     } else {
       return {};

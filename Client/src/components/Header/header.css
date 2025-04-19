@@ -44,10 +44,10 @@
 }
 
 /* Additional specificity to ensure styles are applied */
-/* .site-header .navbar {
+.site-header .navbar {
   background-color:#dfdede1f!important;
    opacity: 1;
-} */
+}
 
 .site-header .nav-link {
   color: #101010 !important; }

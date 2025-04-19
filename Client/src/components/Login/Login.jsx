@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import loginService from "../../Service/login.service";
 import { useAuth } from "../../Contexts/AuthContext";
-import img9 from "../../assets/img/banner/10006.jpg";
+// import img9 from "../../assets/img/banner/10006.jpg";
 
 function Login() {
   const navigate = useNavigate();
@@ -17,6 +17,7 @@ function Login() {
     event.preventDefault();
     let valid = true;
 
+    // Frontend validation
     if (!employee_email) {
       setEmailError("Please enter your email address");
       valid = false;
@@ -46,12 +47,28 @@ function Login() {
       const data = await response.json();
 
       if (response.ok) {
+        // Login success
         localStorage.setItem("employee", JSON.stringify(data.data));
         setIsLogged(true);
         setEmployee(data.data);
         setIsAdmin(data.data.employee_role === 3);
-        navigate("/");
+        // Redirect based on role
+        switch (data.data.employee_role) {
+          case 3: // Admin
+              navigate("/admin");
+              break;
+          case 2: // Manager
+              navigate("/manager");
+              break;
+          case 1: // Employee
+              navigate("/employee");
+              break;
+          default:
+              navigate("/"); // Fallback to home if role not recognized
+              break;
+      }
       } else {
+        // Handle errors properly
         if (data.message === "Incorrect password") {
           setPasswordError("Incorrect password");
         } else if (data.message === "Employee does not exist") {
@@ -67,32 +84,7 @@ function Login() {
 
   return (
     <>
-      <div
-        className="ltn__breadcrumb-area ltn__breadcrumb-area-2 ltn__breadcrumb-color-white"
-        style={{
-          backgroundImage: `url(${img9})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          position: "relative",
-          backgroundAttachment: "fixed",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "400px",
-          zIndex: "-1",
-          marginBottom: 0, // Ensures no margin below the banner
-        }}
-      >
-        <div className="container mx-auto px-6 py-16">
-          <div className="flex flex-wrap justify-between items-center">
-            <div className="section-title-area ltn__section-title-2">
-              <h6 className="section-subtitle text-gray-700 uppercase !text-lg mb-6">
-                // Welcome to our company
-              </h6>
-            </div>
-          </div>
-        </div>
-      </div>
+
 
       <div className="flex justify-center items-center min-h-screen bg-gray-100 p-6 mt-0 relative z-10">
         <div className="flex w-full max-w-4xl overflow-hidden gap-8">

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import AdminMenu from "../../components/Admin/AdminMenu/AdminMenu";
 import AddEmployeeForm from "../../components/Admin/AddEmployeeForm/AddEmployeeFrom";
+import AdminMenu from "../../components/Admin/Adminmenu/AdminMenu";
 
 function AddEmployee() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

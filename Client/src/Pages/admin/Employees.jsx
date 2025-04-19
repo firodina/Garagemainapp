@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
-import AdminMenu from "../../components/Admin/AdminMenu/AdminMenu";
 import EmployeesList from "../../components/Admin/EmployeeList/EmployeeList";
+import AdminMenu from "../../components/Admin/Adminmenu/AdminMenu";
 
 function Employees() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -20,7 +20,7 @@ function Employees() {
       )}
 
       {/* Admin Menu */}
-      <AdminMenu 
+      <AdminMenu
         mobile={mobileMenuOpen} 
         onClose={() => setMobileMenuOpen(false)}
       />

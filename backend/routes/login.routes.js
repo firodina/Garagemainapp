@@ -7,7 +7,7 @@ const loginControllers = require("../controllers/login.controller");
 // Create a route to handle the login request on post
 router.post("/api/employee/login", loginControllers.logIn);
 //route costumer login
-// router.post("/api/customer/login", loginControllers.CustomerlogIn);
+router.post("/api/customer/login", loginControllers.customerLogIn);
 
 
 // Export the router

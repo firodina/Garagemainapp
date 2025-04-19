@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
-import getAuth from "../Utils/employeeAuthHeader "; // Ensure this utility function is correctly implemented
+import getAuth from "../Utils/employeeAuthHeader "; // Utility for employee auth
+import customerAuthHeader from "../Utils/customer"; // Utility for customer auth
 
 const AuthContext = React.createContext();
 
@@ -12,11 +13,13 @@ export const AuthProvider = ({ children }) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [employee, setEmployee] = useState(null);
   const [userType, setUserType] = useState(null);
-  // const [customerId, setCustomerId] = useState(null);
+  const [customer, setCustomer] = useState(null);
+  const [isCustomerLogged, setIsCustomerLogged] = useState(false);
+  
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const loggedInEmployee = await getAuth(); // Adjust based on how `getAuth` works
+        const loggedInEmployee = await getAuth(); // Check employee authentication
 
         if (loggedInEmployee && loggedInEmployee.employee_token) {
           setIsLogged(true);
@@ -28,29 +31,45 @@ export const AuthProvider = ({ children }) => {
           setEmployee(null);
           setUserType(null);
           setIsAdmin(false);
-          // setCustomerId(null);
         }
+
+        const loggedInCustomer = await customerAuthHeader();
+
+        if (loggedInCustomer && loggedInCustomer.customer_token) {
+          setIsLogged(true); // ✅ Important: Treat customer as logged in
+          setIsCustomerLogged(true);
+          setCustomer(loggedInCustomer);
+          setUserType(loggedInCustomer.customer_role);
+        } else {
+          setIsCustomerLogged(false);
+          setCustomer(null);
+        }
+        
       } catch (error) {
         console.error("Error checking authentication:", error);
         setIsLogged(false);
+        setIsCustomerLogged(false);
         setEmployee(null);
+        setCustomer(null);
         setUserType(null);
         setIsAdmin(false);
-        // setCustomerId(null);
       }
     };
 
     checkAuth();
-  }, [userType, isLogged]);
+  }, []);
 
   const logout = () => {
     setIsLogged(false);
     setIsAdmin(false);
     setEmployee(null);
     setUserType(null);
-    // setCustomerId(null);
-    localStorage.removeItem("employee"); // Ensure you clear local storage if it's used
+    setIsCustomerLogged(false);
+    setCustomer(null);
+    localStorage.removeItem("employee"); // Clear employee
+    localStorage.removeItem("customer"); // Clear customer
   };
+
   const value = {
     isLogged,
     isAdmin,
@@ -58,9 +77,12 @@ export const AuthProvider = ({ children }) => {
     setIsLogged,
     setEmployee,
     employee,
+    isCustomerLogged,
+    setIsCustomerLogged,
+    setCustomer,
+    customer,
     logout,
     userType,
-    // customerId,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

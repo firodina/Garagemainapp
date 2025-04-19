@@ -2,9 +2,10 @@ import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../../Contexts/AuthContext";
 
 const PrivateAuthRoute = () => {
-  const { isLogged, userType, logout } = useAuth();
+  const { isLogged, isCustomerLogged } = useAuth();
 
-  return isLogged ? <Outlet /> : <Navigate to={"/login"} />;
+  // Allow access if either an employee or a customer is logged in
+  return isLogged || isCustomerLogged ? <Outlet /> : <Navigate to={"/login"} />;
 };
 
 export default PrivateAuthRoute;

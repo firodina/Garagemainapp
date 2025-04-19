@@ -11,6 +11,11 @@ import {
   FaTools,
   FaAngleDown,
   FaAngleUp,
+  FaCar,
+  FaList,
+  FaFileInvoiceDollar,
+  FaSearch,
+  FaEdit,
 } from "react-icons/fa";
 
 const AdminMenu = () => {
@@ -19,138 +24,207 @@ const AdminMenu = () => {
   const [isOrdersOpen, setIsOrdersOpen] = useState(false);
   const [isEmployeesOpen, setIsEmployeesOpen] = useState(false);
   const [isCustomersOpen, setIsCustomersOpen] = useState(false);
+  const [isVehiclesOpen, setIsVehiclesOpen] = useState(false);
+
+  // Toggle functions for each sub-menu
+  const toggleServicesMenu = () => setIsServicesOpen(!isServicesOpen);
+  const toggleOrdersMenu = () => setIsOrdersOpen(!isOrdersOpen);
+  const toggleEmployeesMenu = () => setIsEmployeesOpen(!isEmployeesOpen);
+  const toggleCustomersMenu = () => setIsCustomersOpen(!isCustomersOpen);
+  const toggleVehiclesMenu = () => setIsVehiclesOpen(!isVehiclesOpen);
 
   return (
-    <div className="w-64 bg-gray-800 text-white   left-0 top-0 overflow-y-auto">
-      <h2 className="text-xl font-bold  !text-white p-4 border-b border-gray-700">Admin Menu</h2>
-      
-      <div className="flex flex-col space-y-1 p-2">
-        {/* Dashboard Link */}
+    <div className="w-full md:w-64 bg-white-800 text-white p-4 h-screen ">
+      <h2 className="text-xl font-bold mb-6 border-b pb-2 text-black">Admin Menu</h2>
+      <div className="space-y-1">
         <Link 
           to="/admin" 
-          className="flex items-center p-3 rounded hover:bg-gray-700 transition-colors duration-200"
+          className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors !no-underline !text-black"
         >
           <FaTachometerAlt className="mr-3" /> Dashboard
         </Link>
 
-        {/* Orders Menu */}
+        {/* Orders menu */}
         <div 
-          className="flex items-center justify-between p-3 rounded hover:bg-gray-700 transition-colors duration-200 cursor-pointer"
-          onClick={() => setIsOrdersOpen(!isOrdersOpen)}
+          className="flex items-center justify-between p-2 rounded hover:bg-gray-700 transition-colors cursor-pointer text-black"
+          onClick={toggleOrdersMenu}
         >
           <div className="flex items-center">
-            <FaBox className="mr-3" /> Orders
+            <FaFileInvoiceDollar className="mr-3" /> Orders
           </div>
-          {isOrdersOpen ? <FaAngleUp /> : <FaAngleDown />}
+          <span>{isOrdersOpen ? <FaAngleUp /> : <FaAngleDown />}</span>
         </div>
-
-        {/* Orders Submenu */}
         {isOrdersOpen && (
-          <div className="ml-6 space-y-1">
+          <div className="ml-4 space-y-1">
             <Link 
-              to="/admin/new-order" 
-              className="flex items-center p-2 pl-4 rounded hover:bg-gray-700 transition-colors duration-200 !no-underline"
+              to="/admin/orders/add" 
+              className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors !no-underline !text-black"
             >
-              <FaPlus className="mr-3" /> New Order
+              <FaPlus className="mr-3" /> Create Order
             </Link>
             <Link 
               to="/admin/orders" 
-              className="flex items-center p-2 pl-4 rounded hover:text-bule !text-white hover:bg-gray-700 transition-colors duration-200 !no-underline"
+              className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors !no-underline !text-black"
             >
-              <FaCog className="mr-3" /> View Orders
+              <FaList className="mr-3" /> All Orders
+            </Link>
+            <Link 
+              to="/admin/orders/pending" 
+              className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors !no-underline !text-black"
+            >
+              <FaSearch className="mr-3" /> Pending Orders
+            </Link>
+            <Link 
+              to="/admin/orders/completed" 
+              className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors !no-underline !text-black"
+            >
+              <FaCog className="mr-3" /> Completed Orders
+            </Link>
+            <Link 
+              to="/admin/orders/:id" 
+              className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors !no-underline !text-black"
+            >
+              <FaEdit className="mr-3" /> Update Status
             </Link>
           </div>
         )}
 
-        {/* Employees Menu */}
+        {/* Employees menu */}
         <div 
-          className="flex items-center justify-between p-3 rounded hover:bg-gray-700 transition-colors duration-200 cursor-pointer"
-          onClick={() => setIsEmployeesOpen(!isEmployeesOpen)}
+          className="flex items-center justify-between p-2 rounded hover:bg-gray-700 transition-colors cursor-pointer text-black"
+          onClick={toggleEmployeesMenu}
         >
           <div className="flex items-center">
             <FaUsers className="mr-3" /> Employees
           </div>
-          {isEmployeesOpen ? <FaAngleUp /> : <FaAngleDown />}
+          <span>{isEmployeesOpen ? <FaAngleUp /> : <FaAngleDown />}</span>
         </div>
-
-        {/* Employees Submenu */}
         {isEmployeesOpen && (
-          <div className="ml-6 space-y-1">
+          <div className="ml-4 space-y-1">
             <Link 
               to="/admin/add-employee" 
-              className="flex items-center p-2 pl-4 rounded hover:bg-gray-700 transition-colors duration-200 !no-underline"
+              className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors !no-underline !text-black"
             >
               <FaUserPlus className="mr-3" /> Add Employee
             </Link>
             <Link 
               to="/admin/employees" 
-              className="flex items-center p-2 pl-4 rounded hover:bg-gray-700 transition-colors duration-200 !no-underline"
+              className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors !no-underline !text-black"
             >
-              <FaUser className="mr-3" /> View Employees
+              <FaList className="mr-3" /> View Employees
             </Link>
           </div>
         )}
 
-        {/* Services Menu */}
+        {/* Services menu */}
         <div 
-          className="flex items-center justify-between p-3 rounded hover:bg-gray-700 transition-colors duration-200 cursor-pointer"
-          onClick={() => setIsServicesOpen(!isServicesOpen)}
+          className="flex items-center justify-between p-2 rounded hover:bg-gray-700 transition-colors cursor-pointer !text-black"
+          onClick={toggleServicesMenu}
         >
           <div className="flex items-center">
             <FaTools className="mr-3" /> Services
           </div>
-          {isServicesOpen ? <FaAngleUp /> : <FaAngleDown />}
+          <span>{isServicesOpen ? <FaAngleUp /> : <FaAngleDown />}</span>
         </div>
-
-        {/* Services Submenu */}
         {isServicesOpen && (
-          <div className="ml-6 space-y-1">
+          <div className="ml-4 space-y-1">
             <Link 
               to="/admin/services/add" 
-              className="flex items-center p-2 pl-4 rounded hover:bg-gray-700 transition-colors duration-200 !no-underline"
+              className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors !no-underline !text-black"
             >
               <FaPlus className="mr-3" /> Add Service
             </Link>
             <Link 
               to="/admin/services/view" 
-              className="flex items-center p-2 pl-4 rounded hover:bg-gray-700 transition-colors duration-200 !no-underline"
+              className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors !no-underline !text-black"
             >
-              <FaCog className="mr-3" /> View Services
+              <FaList className="mr-3" /> View Services
+            </Link>
+            <Link 
+              to="/admin/service-types" 
+              className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors !no-underline !text-black"
+            >
+              <FaCog className="mr-3" /> Service Types
             </Link>
           </div>
         )}
 
-        {/* Customers Menu */}
+        {/* Customers menu */}
         <div 
-          className="flex items-center justify-between p-3 rounded hover:bg-gray-700 transition-colors duration-200 cursor-pointer"
-          onClick={() => setIsCustomersOpen(!isCustomersOpen)}
+          className="flex items-center justify-between p-2 rounded hover:bg-gray-700 transition-colors cursor-pointer !text-black"
+          onClick={toggleCustomersMenu}
         >
           <div className="flex items-center">
             <FaUsers className="mr-3" /> Customers
           </div>
-          {isCustomersOpen ? <FaAngleUp /> : <FaAngleDown />}
+          <span>{isCustomersOpen ? <FaAngleUp /> : <FaAngleDown />}</span>
         </div>
-
-        {/* Customers Submenu */}
         {isCustomersOpen && (
-          <div className="ml-6 space-y-1">
+          <div className="ml-4 space-y-1">
             <Link 
               to="/admin/add_customer" 
-              className="flex items-center p-2 pl-4 rounded hover:bg-gray-700 transition-colors duration-200 !no-underline"
+              className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors !no-underline !text-black"
             >
-              <FaUserPlus  className="mr-3" /> Add Customer
+              <FaUserPlus className="mr-3" /> Add Customer
             </Link>
             <Link 
               to="/admin/customers" 
-              className="flex items-center p-2 pl-4 rounded hover:bg-gray-700 transition-colors duration-200 !no-underline"
+              className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors !no-underline !text-black"
             >
-              <FaUser className="mr-3" /> View Customers
+              <FaList className="mr-3" /> View Customers
             </Link>
           </div>
         )}
+
+        {/* Vehicles menu */}
+        <div 
+          className="flex items-center justify-between p-2 rounded hover:bg-gray-700 transition-colors cursor-pointer !text-black"
+          onClick={toggleVehiclesMenu}
+        >
+          <div className="flex items-center">
+            <FaCar className="mr-3" /> Vehicles
+          </div>
+          <span>{isVehiclesOpen ? <FaAngleUp /> : <FaAngleDown />}</span>
+        </div>
+        {isVehiclesOpen && (
+          <div className="ml-4 space-y-1">
+            <Link 
+              to="/admin/vehicles/add-type" 
+              className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors !no-underline !text-black"
+            >
+              <FaPlus className="mr-3" /> Add Vehicle Type
+            </Link>
+            <Link 
+              to="/admin/vehicles/add" 
+              className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors !no-underline !text-black"
+            >
+              <FaPlus className="mr-3" /> Add Vehicle
+            </Link>
+            <Link 
+              to="/admin/vehicles" 
+              className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors !no-underline !text-black"
+            >
+              <FaList className="mr-3" /> View Vehicles
+            </Link>
+            <Link 
+              to="/admin/vehicle-types" 
+              className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors !no-underline !text-black"
+            >
+              <FaList className="mr-3" /> View Vehicle Types
+            </Link>
+          </div>
+        )}
+
+        {/* Settings menu */}
+        <Link 
+          to="/admin/settings" 
+          className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors !no-underline !text-black"
+        >
+          <FaCog className="mr-3" /> Settings
+        </Link>
       </div>
     </div>
   );
-}
+};
 
 export default AdminMenu;

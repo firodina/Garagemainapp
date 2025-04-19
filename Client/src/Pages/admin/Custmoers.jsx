@@ -1,26 +1,37 @@
-import React from "react";
-import AdminMenu from "../../components/Admin/AdminMenu/AdminMenu";
+import { useState } from "react";
+import AdminMenu from "../../components/Admin/Adminmenu/AdminMenu";
 import CustomersList from "../../components/Admin/CustomerList/CustomerList";
 
-// import CustomerEdit from "./CustomerEdit";
+function Customer() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-function Customers() {
   return (
-    <>
-      <div className="container-fluid admin-pages">
-        <div className="row">
-          <div className="col-md-3 admin-left-side">
-            <AdminMenu />
-          </div>
-          <div className="col-md-9 admin-right-side">
-            
-            <CustomersList />
-           
-          </div>
+    <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
+      {/* Mobile menu button (hidden on desktop) */}
+    
+
+      {/* Mobile Menu Overlay */}
+      {mobileMenuOpen && (
+        <div 
+          className="fixed inset-0 z-40 bg-black bg-opacity-50 md:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Admin Menu */}
+      <AdminMenu 
+        mobile={mobileMenuOpen} 
+        onClose={() => setMobileMenuOpen(false)}
+      />
+
+      {/* Main Content Area */}
+      <div className="flex-1 p-4 md:ml-24 overflow-auto mt-16 md:mt-0">
+        <div className="max-w-6xl mx-auto">
+          <CustomersList/>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
-export default Customers;
+export default Customer;
