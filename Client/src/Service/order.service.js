@@ -61,12 +61,25 @@ const updateOrderStatus = async (orderId, status, token) => {
     throw error;
   }
 };
+const getOrdersByCustomerId = async (customerId, token) => {
+  try {
+    const response = await axios.get(
+      `/orders/customer/${customerId}`,
+      requestOptions(token)
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching orders by customer ID:", error);
+    throw error;
+  }
+};
 
 const orderService = {
   getAllOrders,
   getOrderById,
   createOrder,
   updateOrderStatus,
+  getOrdersByCustomerId,
 };
 
 export default orderService;

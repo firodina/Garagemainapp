@@ -138,6 +138,40 @@ const getVehiclesByCustomerId = async (token, customerId) => {
     throw error;
   }
 };
+
+const updateVehicleType = async (id, vehicleTypeName, token) => {
+  const headers = {
+    "Content-Type": "application/json",
+    "x-access-token": token,
+  };
+
+  try {
+    const response = await axios.put(
+      `/vehicle-types/${id}`,
+      { vehicle_type_name: vehicleTypeName },
+      { headers }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error updating vehicle type:", error);
+    throw error;
+  }
+};
+
+const deleteVehicleType = async (id, token) => {
+  const headers = {
+    "Content-Type": "application/json",
+    "x-access-token": token,
+  };
+
+  try {
+    const response = await axios.delete(`/vehicle-types/${id}`, { headers });
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting vehicle type:", error);
+    throw error;
+  }
+};
 // Export all vehicle functions as a service
 const vehicleService = {
   getAllVehicleTypes,
@@ -148,6 +182,8 @@ const vehicleService = {
   updateVehicle,
   deleteVehicle,
   getVehiclesByCustomerId,
+  updateVehicleType,
+  deleteVehicleType,
 };
 
 export default vehicleService;

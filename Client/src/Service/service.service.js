@@ -126,6 +126,56 @@ const getServicesByVehicleType = async (vehicleTypeId, token) => {
     throw error;
   }
 };
+const getServiceByOrderId = async (orderId, token) => {
+  const requestOptions = {
+    headers: {
+      "Content-Type": "application/json",
+      "x-access-token": token,
+    },
+  };
+
+  try {
+    const response = await axios.get(
+      `/services/order/${orderId}`,
+      requestOptions
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching services by order ID:", error);
+    throw error;
+  }
+};
+// In service.service.js
+const updateServiceStatus = async (orderServiceId, status, token) => {
+  const requestOptions = {
+    headers: {
+      "Content-Type": "application/json",
+      "x-access-token": token,
+    },
+  };
+
+  try {
+    // ✅ Add console log to help debug
+    console.log("Updating Service:", { orderServiceId, status });
+
+    if (orderServiceId === undefined || status === undefined) {
+      console.error("Missing required parameters:", { orderServiceId, status });
+      throw new Error("orderServiceId and status are required");
+    }
+
+    const response = await axios.put(
+      "/services/update-status",
+      { orderServiceId, status },
+      requestOptions
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error in updateServiceStatus:", error);
+    throw error;
+  }
+};
+
 
 
 
@@ -136,6 +186,8 @@ const serviceService = {
   updateService,
   deactivateService,
   getServicesByVehicleType,
+  getServiceByOrderId,
+  updateServiceStatus,
 };
 
 export default serviceService;
