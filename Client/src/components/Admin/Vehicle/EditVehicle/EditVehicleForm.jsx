@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import vehicleService from "../../../../Service/vehicle.service";
 import VehicleTypeSelect from "../VehicleType/VehicleTypeSelect";
 import { useAuth } from "../../../../Contexts/AuthContext";
-import { Spinner } from "react-bootstrap";
+import { Button, Spinner, Alert, Form } from "react-bootstrap";
 
 const EditVehicleForm = () => {
-  const { vehicleId } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
-  const { currentUser } = useAuth();
+  const location = useLocation();
+  const { employee } = useAuth();
   const [formData, setFormData] = useState({
     vehicle_type_name: "",
     make: "",
@@ -21,41 +22,12 @@ const EditVehicleForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [initialLoadError, setInitialLoadError] = useState("");
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const validateVin = (vin) => {
     const vinRegex = /^[A-HJ-NPR-Z0-9]{17}$/i;
     return vinRegex.test(vin);
   };
-
-  useEffect(() => {
-    const fetchVehicle = async () => {
-      try {
-        const vehicle = await vehicleService.getVehicleById(
-          vehicleId,
-          currentUser.token
-        );
-        setFormData({
-          vehicle_type_name: vehicle.vehicle_type_name,
-          make: vehicle.make,
-          model: vehicle.model,
-          year: vehicle.year,
-          VIN: vehicle.VIN,
-        });
-      } catch (error) {
-        console.error("Error fetching vehicle:", error);
-        setInitialLoadError("Failed to load vehicle data");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (currentUser?.token) {
-      fetchVehicle();
-    } else {
-      setInitialLoadError("Authentication required");
-      setLoading(false);
-    }
-  }, [vehicleId, currentUser]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -67,36 +39,81 @@ const EditVehicleForm = () => {
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
-        [name]: "",
+        [name]: null,
       }));
     }
   };
 
   const validateForm = () => {
     const newErrors = {};
-
-    if (!formData.vehicle_type_name)
-      newErrors.vehicle_type_name = "Vehicle type is required";
-    if (!formData.make) newErrors.make = "Make is required";
-    if (!formData.model) newErrors.model = "Model is required";
-    if (!formData.year) newErrors.year = "Year is required";
-    if (!formData.VIN) newErrors.VIN = "VIN is required";
-
-    if (formData.VIN && !validateVin(formData.VIN)) {
-      newErrors.VIN = "Invalid VIN format (17 alphanumeric characters)";
-    }
-
     const currentYear = new Date().getFullYear();
-    if (
-      formData.year &&
-      (formData.year < 1900 || formData.year > currentYear + 1)
-    ) {
+
+    if (!formData.vehicle_type_name.trim()) {
+      newErrors.vehicle_type_name = "Vehicle type is required";
+    }
+    if (!formData.make.trim()) {
+      newErrors.make = "Make is required";
+    }
+    if (!formData.model.trim()) {
+      newErrors.model = "Model is required";
+    }
+    if (!formData.year) {
+      newErrors.year = "Year is required";
+    } else if (formData.year < 1900 || formData.year > currentYear + 1) {
       newErrors.year = `Year must be between 1900 and ${currentYear + 1}`;
+    }
+    if (!formData.VIN.trim()) {
+      newErrors.VIN = "VIN is required";
+    } else if (!validateVin(formData.VIN)) {
+      newErrors.VIN = "Invalid VIN format (17 alphanumeric characters)";
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
+  useEffect(() => {
+    const fetchVehicle = async () => {
+      try {
+        setLoading(true);
+        setInitialLoadError("");
+
+        const token = employee?.employee_token;
+        if (!token) {
+          throw new Error("Authentication required - please log in");
+        }
+
+        const vehicle = await vehicleService.getVehicleById(id, token);
+
+        if (!vehicle) {
+          throw new Error(`Vehicle with ID ${id} not found`);
+        }
+
+        setFormData({
+          vehicle_type_name: vehicle.vehicle_type_name || "",
+          make: vehicle.make || "",
+          model: vehicle.model || "",
+          year: vehicle.year || "",
+          VIN: vehicle.VIN || "",
+        });
+      } catch (error) {
+        console.error("Error fetching vehicle:", error);
+        const errorMsg =
+          error.response?.data?.message ||
+          error.message ||
+          "Failed to load vehicle data";
+        setInitialLoadError(errorMsg);
+
+        if (error.response?.status === 401) {
+          navigate("/login", { state: { from: location.pathname } });
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVehicle();
+  }, [id, employee?.employee_token, navigate, location]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -107,158 +124,193 @@ const EditVehicleForm = () => {
     setSubmitError("");
 
     try {
-      if (!currentUser?.token) {
-        throw new Error("Authentication required");
+      const token = employee?.employee_token;
+      if (!token) {
+        throw new Error("Authentication required - please log in");
       }
 
-      const result = await vehicleService.updateVehicle(
-        vehicleId,
+      const updatedVehicle = await vehicleService.updateVehicle(
+        id,
         formData,
-        currentUser.token
+        token
       );
 
-      if (result) {
-        navigate(`/vehicles/${vehicleId}`, {
-          state: { success: true, message: "Vehicle updated successfully!" },
-        });
+      if (updatedVehicle) {
+        setShowSuccess(true);
+        // Show success message for 3 seconds before redirecting
+        setTimeout(() => {
+          navigate(`/admin/vehicles`);
+        }, 3000);
       } else {
-        setSubmitError("Failed to update vehicle");
+        throw new Error("Failed to update vehicle");
       }
     } catch (error) {
       console.error("Error updating vehicle:", error);
-      setSubmitError(error.message || "Failed to update vehicle");
+      const errorMsg =
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to update vehicle";
+      setSubmitError(errorMsg);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (loading) return <Spinner animation="border" />;
-  if (initialLoadError)
+  if (loading) {
     return (
-      <div className="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg">
-        {initialLoadError}
+      <div className="d-flex justify-content-center mt-5">
+        <Spinner animation="border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </Spinner>
       </div>
     );
+  }
+
+  if (initialLoadError) {
+    return (
+      <Alert variant="danger" className="mt-3">
+        {initialLoadError}
+        <div className="mt-2">
+          <Button variant="link" onClick={() => window.location.reload()}>
+            Try Again
+          </Button>
+        </div>
+      </Alert>
+    );
+  }
 
   return (
-    <div className="container px-4 mx-auto mt-8 max-w-4xl">
-      <h2 className="mb-6 text-2xl font-bold text-gray-800">Edit Vehicle</h2>
-      {submitError && (
-        <div className="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg">
-          {submitError}
-        </div>
-      )}
+    <div className="container mt-4">
+      <h2 className="mb-4">Edit Vehicle</h2>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="vehicle_type_name" className="block mb-2 font-medium text-gray-700">
-            Vehicle Type <span className="text-red-500">*</span>
-          </label>
-          <VehicleTypeSelect
-            name="vehicle_type_name"
-            value={formData.vehicle_type_name}
-            onChange={handleChange}
-            className={`w-full p-2 border rounded-md ${errors.vehicle_type_name ? "border-red-500" : "border-gray-300"}`}
-          />
-          {errors.vehicle_type_name && (
-            <p className="mt-1 text-sm text-red-600">{errors.vehicle_type_name}</p>
+      {showSuccess ? (
+        <Alert variant="success">
+          Vehicle updated successfully! Redirecting to vehicle details...
+        </Alert>
+      ) : (
+        <>
+          {submitError && (
+            <Alert
+              variant="danger"
+              dismissible
+              onClose={() => setSubmitError("")}
+            >
+              {submitError}
+            </Alert>
           )}
-        </div>
 
-        <div>
-          <label htmlFor="make" className="block mb-2 font-medium text-gray-700">
-            Make <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            className={`w-full p-2 border rounded-md ${errors.make ? "border-red-500" : "border-gray-300"}`}
-            id="make"
-            name="make"
-            value={formData.make}
-            onChange={handleChange}
-          />
-          {errors.make && <p className="mt-1 text-sm text-red-600">{errors.make}</p>}
-        </div>
+          <Form onSubmit={handleSubmit}>
+            <Form.Group className="mb-3">
+              <Form.Label>
+                Vehicle Type <span className="text-danger">*</span>
+              </Form.Label>
+              <VehicleTypeSelect
+                name="vehicle_type_name"
+                value={formData.vehicle_type_name}
+                onChange={handleChange}
+                isInvalid={!!errors.vehicle_type_name}
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors.vehicle_type_name}
+              </Form.Control.Feedback>
+            </Form.Group>
 
-        <div>
-          <label htmlFor="model" className="block mb-2 font-medium text-gray-700">
-            Model <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            className={`w-full p-2 border rounded-md ${errors.model ? "border-red-500" : "border-gray-300"}`}
-            id="model"
-            name="model"
-            value={formData.model}
-            onChange={handleChange}
-          />
-          {errors.model && <p className="mt-1 text-sm text-red-600">{errors.model}</p>}
-        </div>
+            <Form.Group className="mb-3">
+              <Form.Label>
+                Make <span className="text-danger">*</span>
+              </Form.Label>
+              <Form.Control
+                type="text"
+                name="make"
+                value={formData.make}
+                onChange={handleChange}
+                isInvalid={!!errors.make}
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors.make}
+              </Form.Control.Feedback>
+            </Form.Group>
 
-        <div>
-          <label htmlFor="year" className="block mb-2 font-medium text-gray-700">
-            Year <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="number"
-            className={`w-full p-2 border rounded-md ${errors.year ? "border-red-500" : "border-gray-300"}`}
-            id="year"
-            name="year"
-            value={formData.year}
-            onChange={handleChange}
-            min="1900"
-            max={new Date().getFullYear() + 1}
-          />
-          {errors.year && <p className="mt-1 text-sm text-red-600">{errors.year}</p>}
-        </div>
+            <Form.Group className="mb-3">
+              <Form.Label>
+                Model <span className="text-danger">*</span>
+              </Form.Label>
+              <Form.Control
+                type="text"
+                name="model"
+                value={formData.model}
+                onChange={handleChange}
+                isInvalid={!!errors.model}
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors.model}
+              </Form.Control.Feedback>
+            </Form.Group>
 
-        <div>
-          <label htmlFor="VIN" className="block mb-2 font-medium text-gray-700">
-            VIN (Vehicle Identification Number) <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            className={`w-full p-2 border rounded-md ${errors.VIN ? "border-red-500" : "border-gray-300"}`}
-            id="VIN"
-            name="VIN"
-            value={formData.VIN}
-            onChange={handleChange}
-            placeholder="17-character VIN"
-          />
-          {errors.VIN && <p className="mt-1 text-sm text-red-600">{errors.VIN}</p>}
-        </div>
+            <Form.Group className="mb-3">
+              <Form.Label>
+                Year <span className="text-danger">*</span>
+              </Form.Label>
+              <Form.Control
+                type="number"
+                name="year"
+                value={formData.year}
+                onChange={handleChange}
+                min="1900"
+                max={new Date().getFullYear() + 1}
+                isInvalid={!!errors.year}
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors.year}
+              </Form.Control.Feedback>
+            </Form.Group>
 
-        <div className="flex justify-end gap-3 mt-6">
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-            className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isSubmitting ? (
-              <span className="flex items-center justify-center">
-                <Spinner
-                  as="span"
-                  animation="border"
-                  size="sm"
-                  role="status"
-                  aria-hidden="true"
-                  className="mr-2"
-                />
-                Updating...
-              </span>
-            ) : (
-              "Update Vehicle"
-            )}
-          </button>
-        </div>
-      </form>
+            <Form.Group className="mb-3">
+              <Form.Label>
+                VIN <span className="text-danger">*</span>
+              </Form.Label>
+              <Form.Control
+                type="text"
+                name="VIN"
+                value={formData.VIN}
+                onChange={handleChange}
+                placeholder="17-character VIN"
+                isInvalid={!!errors.VIN}
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors.VIN}
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <div className="d-flex justify-content-end gap-2 mt-4">
+              <Button
+                variant="outline-secondary"
+                onClick={() => navigate(-1)}
+                disabled={isSubmitting}
+              >
+                Cancel
+              </Button>
+              <Button variant="primary" type="submit" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <Spinner
+                      as="span"
+                      animation="border"
+                      size="sm"
+                      role="status"
+                      aria-hidden="true"
+                      className="me-2"
+                    />
+                    Updating...
+                  </>
+                ) : (
+                  "Update Vehicle"
+                )}
+              </Button>
+            </div>
+          </Form>
+        </>
+      )}
     </div>
   );
 };

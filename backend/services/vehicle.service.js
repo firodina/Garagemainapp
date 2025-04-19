@@ -174,7 +174,14 @@ const deleteVehicle = async (vehicleId) => {
 
 const getVehiclesByCustomerId = async (customerId) => {
   const query = `
-    SELECT v.vehicle_id, v.make, v.model, v.year, v.VIN, vt.vehicle_type_name AS type
+    SELECT 
+      v.vehicle_id, 
+      v.make, 
+      v.model, 
+      v.year, 
+      v.VIN, 
+      v.vehicle_type_id,  
+      vt.vehicle_type_name AS type
     FROM vehicles v
     JOIN vehicle_types vt ON v.vehicle_type_id = vt.vehicle_type_id
     WHERE v.customer_id = ?
@@ -182,7 +189,6 @@ const getVehiclesByCustomerId = async (customerId) => {
 
   try {
     const rows = await conn.query(query, [customerId]);
-    // console.log(rows,customerId);
     return rows;
   } catch (error) {
     console.error("Error fetching vehicles:", error);

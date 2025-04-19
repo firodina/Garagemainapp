@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaArrowUpWideShort } from "react-icons/fa6";
 import { useAuth } from "../../../../Contexts/AuthContext";
@@ -23,6 +23,28 @@ const AddVehicleForm = ({ customerId }) => {
   const [serverError, setServerError] = useState("");
   const [success, setSuccess] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [vehicleTypes, setVehicleTypes] = useState([]);
+  const [loadingTypes, setLoadingTypes] = useState(false);
+
+  useEffect(() => {
+    const fetchVehicleTypes = async () => {
+      if (!token || !showForm) return;
+
+      setLoadingTypes(true);
+      try {
+        const types = await vehicleService.getAllVehicleTypes(token);
+        console.log(types);
+        setVehicleTypes(types);
+      } catch (error) {
+        console.error("Error fetching vehicle types:", error);
+        setServerError("Failed to load vehicle types. Please try again.");
+      } finally {
+        setLoadingTypes(false);
+      }
+    };
+
+    fetchVehicleTypes();
+  }, [token, showForm]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -187,12 +209,21 @@ const AddVehicleForm = ({ customerId }) => {
                     onChange={handleChange}
                     isInvalid={!!errors.vehicle_type_name}
                     required
+                    disabled={loadingTypes}
                   >
-                    <option value="">Select type</option>
-                    <option value="Sedan">Sedan</option>
-                    <option value="SUV">SUV</option>
-                    <option value="Truck">Truck</option>
-                    <option value="Van">Van</option>
+                    <option value="">
+                      {loadingTypes
+                        ? "Loading vehicle types..."
+                        : "Select type"}
+                    </option>
+                    {vehicleTypes.map((type) => (
+                      <option
+                        key={type.vehicle_type_id}
+                        value={type.vehicle_type_name}
+                      >
+                        {type.vehicle_type_name}
+                      </option>
+                    ))}
                   </Form.Control>
                   <Form.Control.Feedback type="invalid">
                     {errors.vehicle_type_name}
@@ -220,7 +251,7 @@ const AddVehicleForm = ({ customerId }) => {
                   <Button
                     variant="primary"
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || loadingTypes}
                     style={{
                       width: "200px",
                       height: "50px",

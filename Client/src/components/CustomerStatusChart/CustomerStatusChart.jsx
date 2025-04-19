@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Doughnut } from "react-chartjs-2";
-import { Card } from "react-bootstrap";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import axios from "axios";
 
-// Register necessary components with ChartJS
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const CustomerStatsChart = () => {
@@ -15,9 +13,7 @@ const CustomerStatsChart = () => {
   useEffect(() => {
     const fetchCustomerStats = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:3000/api/customers/status"
-        );
+        const response = await axios.get("http://localhost:3000/api/customers/status");
         const data = response.data.data;
 
         if (data) {
@@ -36,25 +32,25 @@ const CustomerStatsChart = () => {
                   data.totalCustomers[0],
                 ],
                 backgroundColor: [
-                  "rgba(0, 255, 0, 0.8)",
-                  "rgba(255, 99, 132, 0.8)",
-                  "rgba(255, 159, 64, 0.8)",
+                  "rgba(34,197,94,0.6)",
+                  "rgba(239,68,68,0.6)",
+                  "rgba(251,191,36,0.6)",
                 ],
                 borderColor: [
-                  "rgba(0, 255, 0, 1)",
-                  "rgba(255, 99, 132, 1)",
-                  "rgba(255, 159, 64, 1)",
+                  "rgba(34,197,94,1)",
+                  "rgba(239,68,68,1)",
+                  "rgba(251,191,36,1)",
                 ],
                 borderWidth: 2,
               },
             ],
           });
         } else {
-          setError("Data is empty or not in the expected format.");
+          setError("No data available");
         }
       } catch (error) {
         console.error("Error fetching customer stats:", error);
-        setError("Error fetching customer stats.");
+        setError("Failed to fetch customer stats.");
       } finally {
         setLoading(false);
       }
@@ -63,33 +59,17 @@ const CustomerStatsChart = () => {
     fetchCustomerStats();
   }, []);
 
-  if (loading) {
-    return (
-      <Card>
-        <Card.Header as="h5">Customer Statistics</Card.Header>
-        <Card.Body>Loading...</Card.Body>
-      </Card>
-    );
-  }
-
-  if (error) {
-    return (
-      <Card>
-        <Card.Header as="h5">Customer Statistics</Card.Header>
-        <Card.Body>{error}</Card.Body>
-      </Card>
-    );
-  }
-
   return (
-    <Card>
-      <Card.Header as="h5">Customer Statistics</Card.Header>
-      <Card.Body>
-        <div style={{ height: "100%" }}>
-          <Doughnut data={chartData} />
-        </div>
-      </Card.Body>
-    </Card>
+    <div className="bg-white border border-gray-300 rounded-xl p-6 h-[80vh] shadow-md">
+      <h2 className="text-lg font-semibold text-gray-800 mb-4">Customer Statistics</h2>
+      {loading ? (
+        <div className="flex justify-center items-center h-full text-gray-500">Loading...</div>
+      ) : error ? (
+        <div className="text-red-500">{error}</div>
+      ) : (
+        <Doughnut data={chartData} />
+      )}
+    </div>
   );
 };
 

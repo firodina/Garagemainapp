@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import customerService from "../../../Service/customer.service";
-import { useAuth } from "../../../Contexts/AuthContext";
-import AddVehicleForm from "../Vehicle/AddVehicle/AddVehicleForm";
+import customerService from "../../../../Service/customer.service";
+import { useAuth } from "../../../../Contexts/AuthContext";
+import AddVehicleForm from "../../Vehicle/AddVehicle/AddVehicleForm";
 
 function AddCustomerForm() {
   const [email, setEmail] = useState("");

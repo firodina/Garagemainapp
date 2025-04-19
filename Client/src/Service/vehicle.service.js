@@ -9,6 +9,7 @@ const getAllVehicleTypes = async (token) => {
 
   try {
     const response = await axios.get("/vehicletypes", { headers });
+    console.log(response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching vehicle types:", error);
@@ -74,13 +75,17 @@ const getAllVehicles = async (token) => {
 };
 
 const getVehicleById = async (vehicleId, token) => {
+  console.log(vehicleId);
   const headers = {
     "Content-Type": "application/json",
     "x-access-token": token,
   };
 
   try {
+    console.log(`Fetching vehicle with ID: ${vehicleId}`);
     const response = await axios.get(`/vehicles/${vehicleId}`, { headers });
+    console.log(response.data);
+    
     return response.data;
   } catch (error) {
     console.error("Error fetching vehicle:", error);
@@ -90,15 +95,18 @@ const getVehicleById = async (vehicleId, token) => {
 
 // Update these methods in your vehicle service
 const updateVehicle = async (vehicleId, vehicleData, token) => {
-  const headers = {
-    "Content-Type": "application/json",
-    "x-access-token": token,
-  };
-
   try {
-    const response = await axios.put(`/api/vehicles/${vehicleId}`, vehicleData, {
-      headers,
-    });
+    const response = await axios.put(
+      `/vehicles/${vehicleId}`,
+      vehicleData,
+      console.log(vehicleData),
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "x-access-token": token,
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Error updating vehicle:", error);
@@ -113,7 +121,7 @@ const deleteVehicle = async (vehicleId, token) => {
   };
 
   try {
-    const response = await axios.delete(`/api/vehicles/${vehicleId}`, { headers });
+    const response = await axios.delete(`/vehicles/${vehicleId}`, { headers });
     return response.data;
   } catch (error) {
     console.error("Error deleting vehicle:", error);
@@ -131,7 +139,7 @@ const getVehiclesByCustomerId = async (token, customerId) => {
       `/customer/${customerId}/vehicles`,
       { headers }
     );
-    console.log(response);
+    console.log(response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching customer vehicles:", error);
@@ -172,6 +180,7 @@ const deleteVehicleType = async (id, token) => {
     throw error;
   }
 };
+
 // Export all vehicle functions as a service
 const vehicleService = {
   getAllVehicleTypes,
@@ -183,7 +192,7 @@ const vehicleService = {
   deleteVehicle,
   getVehiclesByCustomerId,
   updateVehicleType,
-  deleteVehicleType,
+  deleteVehicleType
 };
 
 export default vehicleService;

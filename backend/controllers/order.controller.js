@@ -1,27 +1,45 @@
 const orderService = require("../services/order.service");
 
 // Create a new order
-const createOrder = async (req, res) => {
-  try {
-    const orderData = req.body;
-    const newOrder = await orderService.createOrder(orderData);
-    res.status(201).json(newOrder);
-  } catch (err) {
-    res
-      .status(500)
-      .json({ message: "Failed to create order", error: err.message });
-  }
-};
+async function createOrder(req, res) {
+  const orderData = req.body;
+  console.log(orderData);
 
+  // Validate incoming data
+  if (!orderData.customer_id || !orderData.total_price) {
+    return res
+      .status(400)
+      .json({ message: "Customer ID and Total Price are required." });
+  }
+
+  try {
+    // Call the service to create the order
+    const result = await orderService.createOrder(orderData);
+    return res
+      .status(201)
+      .json({ message: "Order created successfully", order: result });
+  } catch (error) {
+    console.error("Error creating order:", error);
+    return res
+      .status(500)
+      .json({ message: "Failed to create order", error: error.message });
+  }
+}
 // Get all orders
 const getAllOrders = async (req, res) => {
   try {
     const orders = await orderService.getAllOrders();
-    res.status(200).json(orders);
+    res.status(200).json({
+      success: true,
+      data: orders,
+    });
   } catch (err) {
-    res
-      .status(500)
-      .json({ message: "Failed to fetch orders", error: err.message });
+    console.error("Controller error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch orders",
+      error: err.message,
+    });
   }
 };
 

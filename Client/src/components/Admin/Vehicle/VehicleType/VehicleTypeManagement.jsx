@@ -1,20 +1,60 @@
 import React, { useState, useEffect } from "react";
 import vehicleService from "../../../../Service/vehicle.service";
-import { FaPlus, FaTrash, FaEdit } from "react-icons/fa";
+import {
+  Card,
+  Table,
+  Button,
+  Form,
+  Modal,
+  Spinner,
+  Alert,
+  Pagination,
+  Badge,
+  InputGroup,
+  FormControl,
+} from "react-bootstrap";
+import { FaPlus, FaTrash, FaEdit, FaSearch, FaCar } from "react-icons/fa";
+import { useAuth } from "../../../../Contexts/AuthContext";
+
 
 const VehicleTypeManagement = () => {
+  const { employee } = useAuth();
+  const token = employee?.employee_token;
+
   const [vehicleTypes, setVehicleTypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [newTypeName, setNewTypeName] = useState("");
+  const [editType, setEditType] = useState({ id: "", name: "" });
+  const [deleteTypeId, setDeleteTypeId] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(8);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Filter vehicle types based on search term
+  const filteredVehicleTypes = vehicleTypes.filter((type) =>
+    type.vehicle_type_name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Calculate pagination
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredVehicleTypes.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
+  const totalPages = Math.ceil(filteredVehicleTypes.length / itemsPerPage);
 
   useEffect(() => {
     const fetchVehicleTypes = async () => {
       try {
-        const types = await vehicleService.getAllVehicleTypes();
+        const types = await vehicleService.getAllVehicleTypes(token);
         setVehicleTypes(types);
       } catch (err) {
         setError("Failed to load vehicle types");
@@ -25,7 +65,16 @@ const VehicleTypeManagement = () => {
     };
 
     fetchVehicleTypes();
-  }, []);
+  }, [token]);
+
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage("");
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
 
   const handleAddType = async () => {
     if (!newTypeName.trim()) {
@@ -37,18 +86,20 @@ const VehicleTypeManagement = () => {
     setSubmitError("");
 
     try {
-      const result = await vehicleService.createVehicleType(newTypeName.trim());
-      if (result) {
-        setVehicleTypes((prev) => [
-          ...prev,
-          {
-            vehicle_type_id: result.data.vehicleTypeId,
-            vehicle_type_name: newTypeName.trim(),
-          },
-        ]);
-        setNewTypeName("");
-        setShowModal(false);
-      }
+      const result = await vehicleService.createVehicleType(
+        newTypeName.trim(),
+        token
+      );
+      setVehicleTypes((prev) => [
+        ...prev,
+        {
+          vehicle_type_id: result.vehicle_type_id,
+          vehicle_type_name: newTypeName.trim(),
+        },
+      ]);
+      setNewTypeName("");
+      setShowModal(false);
+      setSuccessMessage("Vehicle type added successfully!");
     } catch (error) {
       console.error("Error creating vehicle type:", error);
       setSubmitError(error.message || "Failed to create vehicle type");
@@ -57,127 +108,390 @@ const VehicleTypeManagement = () => {
     }
   };
 
-  if (loading) return (
-    <div className="flex justify-center items-center h-64">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-    </div>
-  );
+  const handleEditType = async () => {
+    if (!editType.name.trim()) {
+      setSubmitError("Vehicle type name is required");
+      return;
+    }
 
-  if (error) return (
-    <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded">
-      <p>{error}</p>
-    </div>
-  );
+    setIsSubmitting(true);
+    setSubmitError("");
+
+    try {
+      await vehicleService.updateVehicleType(
+        editType.id,
+        editType.name.trim(),
+        token
+      );
+      setVehicleTypes((prev) =>
+        prev.map((type) =>
+          type.vehicle_type_id === editType.id
+            ? { ...type, vehicle_type_name: editType.name.trim() }
+            : type
+        )
+      );
+      setShowEditModal(false);
+      setSuccessMessage("Vehicle type updated successfully!");
+    } catch (error) {
+      console.error("Error updating vehicle type:", error);
+      setSubmitError(error.message || "Failed to update vehicle type");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteType = async () => {
+    setIsSubmitting(true);
+    setSubmitError("");
+
+    try {
+      await vehicleService.deleteVehicleType(deleteTypeId, token);
+      setVehicleTypes((prev) =>
+        prev.filter((type) => type.vehicle_type_id !== deleteTypeId)
+      );
+      setShowDeleteModal(false);
+      setSuccessMessage("Vehicle type deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting vehicle type:", error);
+      setSubmitError(error.message || "Failed to delete vehicle type");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const openEditModal = (type) => {
+    setEditType({ id: type.vehicle_type_id, name: type.vehicle_type_name });
+    setShowEditModal(true);
+    setSubmitError("");
+  };
+
+  const openDeleteModal = (id) => {
+    setDeleteTypeId(id);
+    setShowDeleteModal(true);
+    setSubmitError("");
+  };
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  if (loading) {
+    return (
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ height: "50vh" }}
+      >
+        <Spinner animation="border" variant="primary" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mt-4">
+        <Alert variant="danger">{error}</Alert>
+      </div>
+    );
+  }
 
   return (
-    <div className="container mx-auto px-4 py-6">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-semibold text-gray-800">Vehicle Type Management</h2>
-        <button
-          onClick={() => setShowModal(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded flex items-center transition duration-150"
-        >
-          <FaPlus className="mr-2" />
-          Add Vehicle Type
-        </button>
-      </div>
+    <div className="container mt-4">
+      <Card className="shadow-sm">
+        <Card.Header className="bg-primary text-white d-flex justify-content-between align-items-center">
+          <h4 className="mb-0">
+            <FaCar className="me-2" />
+            Vehicle Type Management
+          </h4>
+          <Button variant="light" onClick={() => setShowModal(true)}>
+            <FaPlus className="me-2" />
+            Add New Type
+          </Button>
+        </Card.Header>
 
-      <div className="overflow-x-auto shadow-md rounded-lg">
-        <table className="min-w-full bg-white border-collapse">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-              <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type Name</th>
-              <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {vehicleTypes.map((type) => (
-              <tr key={type.vehicle_type_id} className="hover:bg-gray-50">
-                <td className="py-4 px-6 whitespace-nowrap text-sm text-gray-900">{type.vehicle_type_id}</td>
-                <td className="py-4 px-6 whitespace-nowrap text-sm text-gray-900">{type.vehicle_type_name}</td>
-                <td className="py-4 px-6 whitespace-nowrap text-sm text-gray-900">
-                  <div className="flex space-x-2">
-                    <button className="bg-yellow-100 hover:bg-yellow-200 text-yellow-800 p-2 rounded-md">
-                      <FaEdit />
-                    </button>
-                    <button className="bg-red-100 hover:bg-red-200 text-red-800 p-2 rounded-md">
-                      <FaTrash />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+        <Card.Body>
+          {successMessage && (
+            <Alert
+              variant="success"
+              onClose={() => setSuccessMessage("")}
+              dismissible
+              className="animate__animated animate__fadeIn"
+            >
+              {successMessage}
+            </Alert>
+          )}
 
-      {/* Add Vehicle Type Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
-            <div className="flex justify-between items-center border-b p-4">
-              <h3 className="text-lg font-semibold">Add New Vehicle Type</h3>
-              <button 
-                onClick={() => setShowModal(false)} 
-                className="text-gray-500 hover:text-gray-700"
-              >
-                &times;
-              </button>
-            </div>
-            
-            <div className="p-4">
-              {submitError && (
-                <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-3 mb-4 rounded">
-                  {submitError}
-                </div>
-              )}
-              
-              <div className="mb-4">
-                <label htmlFor="vehicleTypeName" className="block text-sm font-medium text-gray-700 mb-1">
-                  Vehicle Type Name
-                </label>
-                <input
-                  type="text"
-                  id="vehicleTypeName"
-                  value={newTypeName}
-                  onChange={(e) => setNewTypeName(e.target.value)}
-                  placeholder="Enter vehicle type name"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-            </div>
-            
-            <div className="flex justify-end space-x-3 p-4 border-t">
-              <button
-                onClick={() => setShowModal(false)}
-                className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition duration-150"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleAddType}
-                disabled={isSubmitting}
-                className={`px-4 py-2 text-white rounded-md transition duration-150 flex items-center ${
-                  isSubmitting ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
-                }`}
-              >
-                {isSubmitting ? (
-                  <>
-                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Adding...
-                  </>
-                ) : (
-                  "Add Type"
-                )}
-              </button>
+          <div className="mb-4">
+            <InputGroup className="mb-3">
+              <InputGroup.Text>
+                <FaSearch />
+              </InputGroup.Text>
+              <FormControl
+                placeholder="Search vehicle types..."
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1);
+                }}
+              />
+            </InputGroup>
+
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <h5 className="mb-0">
+                Showing {filteredVehicleTypes.length} vehicle types
+              </h5>
+              <Badge bg="info" pill>
+                Page {currentPage} of {totalPages}
+              </Badge>
             </div>
           </div>
-        </div>
-      )}
+
+          <div className="table-responsive">
+            <Table hover className="mb-0">
+              <thead className="table-dark">
+                <tr>
+                  <th>ID</th>
+                  <th>Type Name</th>
+                  <th className="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentItems.length > 0 ? (
+                  currentItems.map((type) => (
+                    <tr key={type.vehicle_type_id}>
+                      <td>
+                        <Badge bg="secondary">#{type.vehicle_type_id}</Badge>
+                      </td>
+                      <td className="fw-bold">{type.vehicle_type_name}</td>
+                      <td className="text-end">
+                        <Button
+                          variant="outline-primary"
+                          size="sm"
+                          className="me-2"
+                          onClick={() => openEditModal(type)}
+                        >
+                          <FaEdit className="me-1" />
+                          Edit
+                        </Button>
+                        <Button
+                          variant="outline-danger"
+                          size="sm"
+                          onClick={() => openDeleteModal(type.vehicle_type_id)}
+                        >
+                          <FaTrash className="me-1" />
+                          Delete
+                        </Button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="3" className="text-center py-4">
+                      {searchTerm ? (
+                        <div className="text-muted">
+                          No vehicle types found matching "{searchTerm}"
+                        </div>
+                      ) : (
+                        <div className="text-muted">
+                          No vehicle types available. Add one to get started.
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </Table>
+          </div>
+
+          {filteredVehicleTypes.length > itemsPerPage && (
+            <div className="d-flex justify-content-center mt-4">
+              <Pagination>
+                <Pagination.First
+                  onClick={() => setCurrentPage(1)}
+                  disabled={currentPage === 1}
+                />
+                <Pagination.Prev
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
+                  disabled={currentPage === 1}
+                />
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <Pagination.Item
+                    key={i + 1}
+                    active={i + 1 === currentPage}
+                    onClick={() => handlePageChange(i + 1)}
+                  >
+                    {i + 1}
+                  </Pagination.Item>
+                ))}
+                <Pagination.Next
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
+                  disabled={currentPage === totalPages}
+                />
+                <Pagination.Last
+                  onClick={() => setCurrentPage(totalPages)}
+                  disabled={currentPage === totalPages}
+                />
+              </Pagination>
+            </div>
+          )}
+        </Card.Body>
+      </Card>
+
+      {/* Add Vehicle Type Modal */}
+      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+        <Modal.Header closeButton className="bg-primary text-white">
+          <Modal.Title>
+            <FaPlus className="me-2" />
+            Add New Vehicle Type
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {submitError && <Alert variant="danger">{submitError}</Alert>}
+          <Form.Group controlId="vehicleTypeName" className="mb-3">
+            <Form.Label className="fw-bold">Vehicle Type Name</Form.Label>
+            <Form.Control
+              type="text"
+              value={newTypeName}
+              onChange={(e) => setNewTypeName(e.target.value)}
+              placeholder="e.g. Sedan, SUV, Truck"
+              className="py-2"
+            />
+          </Form.Group>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
+            Cancel
+          </Button>
+          <Button
+            variant="primary"
+            onClick={handleAddType}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <>
+                <Spinner
+                  as="span"
+                  animation="border"
+                  size="sm"
+                  role="status"
+                  aria-hidden="true"
+                  className="me-2"
+                />
+                Adding...
+              </>
+            ) : (
+              "Add Vehicle Type"
+            )}
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Edit Vehicle Type Modal */}
+      <Modal
+        show={showEditModal}
+        onHide={() => setShowEditModal(false)}
+        centered
+      >
+        <Modal.Header closeButton className="bg-primary text-white">
+          <Modal.Title>
+            <FaEdit className="me-2" />
+            Edit Vehicle Type
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {submitError && <Alert variant="danger">{submitError}</Alert>}
+          <Form.Group controlId="editVehicleTypeName" className="mb-3">
+            <Form.Label className="fw-bold">Vehicle Type Name</Form.Label>
+            <Form.Control
+              type="text"
+              value={editType.name}
+              onChange={(e) =>
+                setEditType({ ...editType, name: e.target.value })
+              }
+              placeholder="Enter vehicle type name"
+              className="py-2"
+            />
+          </Form.Group>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowEditModal(false)}>
+            Cancel
+          </Button>
+          <Button
+            variant="primary"
+            onClick={handleEditType}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <>
+                <Spinner
+                  as="span"
+                  animation="border"
+                  size="sm"
+                  role="status"
+                  aria-hidden="true"
+                  className="me-2"
+                />
+                Updating...
+              </>
+            ) : (
+              "Save Changes"
+            )}
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        show={showDeleteModal}
+        onHide={() => setShowDeleteModal(false)}
+        centered
+      >
+        <Modal.Header closeButton className="bg-danger text-white">
+          <Modal.Title>
+            <FaTrash className="me-2" />
+            Confirm Deletion
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {submitError && <Alert variant="danger">{submitError}</Alert>}
+          <p className="lead">
+            Are you sure you want to delete this vehicle type?
+          </p>
+          <p className="text-muted">
+            This action cannot be undone. All vehicles associated with this type
+            will need to be updated.
+          </p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+            Cancel
+          </Button>
+          <Button
+            variant="danger"
+            onClick={handleDeleteType}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <>
+                <Spinner
+                  as="span"
+                  animation="border"
+                  size="sm"
+                  role="status"
+                  aria-hidden="true"
+                  className="me-2"
+                />
+                Deleting...
+              </>
+            ) : (
+              "Delete Permanently"
+            )}
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

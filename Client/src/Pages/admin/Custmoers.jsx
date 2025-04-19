@@ -1,6 +1,6 @@
 import { useState } from "react";
 import AdminMenu from "../../components/Admin/Adminmenu/AdminMenu";
-import CustomersList from "../../components/Admin/CustomerList/CustomerList";
+import CustomersList from "../../components/Admin/Customer/CustomerList/CustomerList";
 
 function Customer() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

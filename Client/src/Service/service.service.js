@@ -101,6 +101,7 @@ const deactivateService = async (serviceId, token) => {
 
 const getServicesByVehicleType = async (vehicleTypeId, token) => {
   // Check if vehicleTypeId is valid
+  // console.log(vehicleTypeId);
   if (!vehicleTypeId) {
     console.error("Invalid vehicleTypeId:", vehicleTypeId);
     throw new Error("Invalid vehicleTypeId provided");
@@ -118,6 +119,7 @@ const getServicesByVehicleType = async (vehicleTypeId, token) => {
       `/services/type/${vehicleTypeId}`,
       requestOptions
     );
+
 
     console.log(response);
     return response.data;
@@ -175,7 +177,6 @@ const updateServiceStatus = async (orderServiceId, status, token) => {
     throw error;
   }
 };
-
 
 
 

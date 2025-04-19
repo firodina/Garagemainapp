@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import customerService from "../../../Service/customer.service"
-import { useAuth } from "../../../Contexts/AuthContext";
+import customerService from "../../../../Service/customer.service"
+import { useAuth } from "../../../../Contexts/AuthContext";
 import { FaRegEdit, FaTrash, FaEye } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import SearchCustomer from "../SearchCustomer/SearchCustomer"; // import the SearchCustomer component

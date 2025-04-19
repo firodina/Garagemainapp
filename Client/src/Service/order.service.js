@@ -7,24 +7,33 @@ const requestOptions = (token) => ({
   },
 });
 
-// Get all orders
-const getAllOrders = async (token) => {
+// Get all orders// order.service.js
+const getAllOrders = async () => {
   try {
-    const response = await axios.get("/orders", requestOptions(token));
-    return response.data;
+    const response = await axios.get("/orders");
+
+    if (!response.data.success || !Array.isArray(response.data.data)) {
+      throw new Error("Invalid data format received from server");
+    }
+
+    return response.data.data;
   } catch (error) {
     console.error("Error fetching orders:", error);
-    throw error;
+    throw new Error(
+      error.response?.data?.message || error.message || "Failed to fetch orders"
+    );
   }
 };
 
 // Get order by ID
-const getOrderById = async (orderId, token) => {
+const getOrderById = async (id, token) => {
   try {
+    console.log(id);
     const response = await axios.get(
-      `/orders/${orderId}`,
+      `/orders/${id}`,
       requestOptions(token)
     );
+    console.log(response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching order:", error);
@@ -34,12 +43,14 @@ const getOrderById = async (orderId, token) => {
 
 // Create a new order
 const createOrder = async (orderData, token) => {
+  console.log(orderData, token);
   try {
     const response = await axios.post(
       "/order",
       orderData,
       requestOptions(token)
     );
+    console.log(response.data);
     return response.data;
   } catch (error) {
     console.error("Error creating order:", error);

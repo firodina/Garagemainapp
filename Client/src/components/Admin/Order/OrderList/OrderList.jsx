@@ -1,145 +1,385 @@
 import React, { useState, useEffect } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Typography,
+  CircularProgress,
+  Box,
+  Button,
+  Chip,
+  Pagination,
+  TextField,
+  InputAdornment,
+  IconButton,
+  Tabs,
+  Tab,
+  Tooltip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Alert,
+} from "@mui/material";
 import { Link } from "react-router-dom";
-import OrderStatusChip from "../OrderStatus/OrderStatusChip";
-import orderService from "../../../../Service/customer.service";
-import { useAuth } from "../../../../Contexts/AuthContext";
+import SearchIcon from "@mui/icons-material/Search";
+import ClearIcon from "@mui/icons-material/Clear";
+import orderService from "../../../../Service/order.service";
 
 const OrderList = () => {
   const [orders, setOrders] = useState([]);
+  const [filteredOrders, setFilteredOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { token } = useAuth();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [page, setPage] = useState(1);
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [orderToDelete, setOrderToDelete] = useState(null);
+  const itemsPerPage = 10;
+
+  const statusOptions = [
+    { value: "all", label: "All" },
+    { value: "pending", label: "Pending" },
+    { value: "in progress", label: "In Progress" },
+    { value: "completed", label: "Completed" },
+  ];
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const data = await orderService.getAllOrders(token);
-        setOrders(data);
+        const data = await orderService.getAllOrders();
+        const normalizedData = data.map((order) => ({
+          ...order,
+          status: order.status?.toLowerCase(),
+        }));
+        setOrders(normalizedData);
+        setFilteredOrders(normalizedData);
       } catch (err) {
-        console.error("Failed to load orders:", err);
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
 
-    if (token) {
-      fetchOrders();
+    fetchOrders();
+  }, []);
+
+  useEffect(() => {
+    let filtered = [...orders];
+
+    if (statusFilter !== "all") {
+      filtered = filtered.filter(
+        (order) => order.status?.toLowerCase() === statusFilter?.toLowerCase()
+      );
     }
-  }, [token]);
+
+    if (searchQuery.trim() !== "") {
+      const searchTerm = searchQuery?.toLowerCase();
+      filtered = filtered.filter((order) => {
+        return (
+          order.order_id.toString().includes(searchTerm) ||
+          (order.first_name + " " + order.last_name)
+            ?.toLowerCase()
+            .includes(searchTerm) ||
+          order.status?.toLowerCase().includes(searchTerm) ||
+          order.total_price.toString().includes(searchTerm)
+        );
+      });
+    }
+
+    setFilteredOrders(filtered);
+    setPage(1);
+  }, [statusFilter, searchQuery, orders]);
+
+  const handleClearSearch = () => {
+    setSearchQuery("");
+  };
+
+  const handlePageChange = (event, value) => {
+    setPage(value);
+  };
+
+  const handleStatusFilterChange = (event, newValue) => {
+    setStatusFilter(newValue);
+  };
+
+  const handleDeleteClick = (order) => {
+    setOrderToDelete(order);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      // await orderService.deleteOrder(orderToDelete.order_id);
+      setOrders(orders.filter((o) => o.order_id !== orderToDelete.order_id));
+      setDeleteDialogOpen(false);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
+  const currentOrders = filteredOrders.slice(
+    (page - 1) * itemsPerPage,
+    page * itemsPerPage
+  );
 
   if (loading) {
     return (
-      <div className="flex justify-center mt-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
+      <Box display="flex" justifyContent="center" mt={4}>
+        <CircularProgress />
+      </Box>
     );
   }
 
   if (error) {
     return (
-      <p className="text-red-500 text-center mt-4">
-        Error loading orders: {error}
-      </p>
+      <Alert severity="error" sx={{ mt: 2 }}>
+        {error}
+      </Alert>
     );
   }
 
   return (
-    <div className="overflow-x-auto bg-white rounded-lg shadow">
-      {/* Mobile View */}
-      <div className="md:hidden">
-        {orders.map((order) => (
-          <div key={order.order_id} className="p-4 border-b">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="font-semibold">#{order.order_id}</p>
-                <p className="text-gray-600">{`${order.first_name} ${order.last_name}`}</p>
-              </div>
-              <OrderStatusChip status={order.status} />
-            </div>
-            <div className="mt-2 grid grid-cols-2 gap-2">
-              <div>
-                <p className="text-sm text-gray-500">Date</p>
-                <p>{new Date(order.order_date).toLocaleDateString()}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Total</p>
-                <p>${Number(order.total_price).toFixed(2)}</p>
-              </div>
-            </div>
-            <div className="mt-3">
-              <Link
-                to={`/orders/${order.order_id}`}
-                className="inline-block px-3 py-1 text-sm border border-blue-500 text-blue-500 rounded hover:bg-blue-50"
-              >
-                View Details
-              </Link>
-            </div>
-          </div>
-        ))}
-      </div>
+    <Box sx={{ p: 3 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 3,
+          gap: 2,
+        }}
+      >
+        <Typography variant="h5" component="h2" fontWeight="bold">
+          Orders
+        </Typography>
 
-      {/* Tablet/Desktop View */}
-      <table className="hidden md:table w-full">
-        <thead className="bg-gray-50">
-          <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Order ID
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Customer
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Date
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Total Price
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Status
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {orders.map((order) => (
-            <tr key={order.order_id} className="hover:bg-gray-50">
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                #{order.order_id}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {`${order.first_name} ${order.last_name}`}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {new Date(order.order_date).toLocaleDateString()}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                ${Number(order.total_price).toFixed(2)}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <OrderStatusChip status={order.status} />
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                <Link
-                  to={`/orders/${order.order_id}`}
-                  className="text-blue-600 hover:text-blue-900"
-                >
-                  View
-                </Link>
-              </td>
-            </tr>
+        <TextField
+          variant="outlined"
+          size="small"
+          placeholder="Search orders..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon color="action" />
+              </InputAdornment>
+            ),
+            endAdornment: searchQuery && (
+              <InputAdornment position="end">
+                <IconButton size="small" onClick={handleClearSearch} edge="end">
+                  <ClearIcon fontSize="small" />
+                </IconButton>
+              </InputAdornment>
+            ),
+            sx: {
+              borderRadius: "4px",
+              backgroundColor: "background.paper",
+              "&:hover": {
+                backgroundColor: "action.hover",
+              },
+            },
+          }}
+          sx={{
+            width: 300,
+            "& .MuiOutlinedInput-root": {
+              paddingRight: 1,
+            },
+          }}
+        />
+      </Box>
+
+      <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
+        <Tabs
+          value={statusFilter}
+          onChange={handleStatusFilterChange}
+          variant="scrollable"
+          scrollButtons="auto"
+          allowScrollButtonsMobile
+        >
+          {statusOptions.map((option) => (
+            <Tab
+              key={option.value}
+              label={option.label}
+              value={option.value}
+              sx={{
+                minWidth: "auto",
+                px: 2,
+                textTransform: "none",
+                fontWeight: "medium",
+              }}
+            />
           ))}
-        </tbody>
-      </table>
+        </Tabs>
+      </Box>
 
-      {orders.length === 0 && (
-        <div className="p-8 text-center text-gray-500">
-          No orders found
-        </div>
+      {filteredOrders.length === 0 ? (
+        <Typography variant="body1" align="center" mt={4}>
+          {searchQuery
+            ? "No matching orders found"
+            : `No ${
+                statusFilter === "all" ? "" : statusFilter + " "
+              }orders found`}
+        </Typography>
+      ) : (
+        <>
+          <TableContainer
+            component={Paper}
+            elevation={3}
+            sx={{
+              border: "1px solid",
+              borderColor: "divider",
+              borderRadius: "8px",
+              overflow: "hidden",
+            }}
+          >
+            <Table aria-label="orders table">
+              <TableHead sx={{ backgroundColor: "background.default" }}>
+                <TableRow>
+                  {[
+                    "Order ID",
+                    "Customer",
+                    "Date",
+                    "Amount",
+                    "Status",
+                    "Actions",
+                  ].map((header) => (
+                    <TableCell
+                      key={header}
+                      sx={{
+                        fontWeight: "bold",
+                        py: 2,
+                        borderBottom: "none",
+                      }}
+                    >
+                      {header}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {currentOrders.map((order) => (
+                  <TableRow
+                    key={order.order_id}
+                    hover
+                    sx={{ "&:last-child td": { borderBottom: 0 } }}
+                  >
+                    <TableCell>#{order.order_id}</TableCell>
+                    <TableCell>
+                      {order.customer?.name ||
+                        `${order.first_name} ${order.last_name}`}
+                    </TableCell>
+                    <TableCell>
+                      {new Date(order.order_date).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </TableCell>
+                    <TableCell>
+                      {Number(order.total_price).toFixed(2)}
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        label={order.status}
+                        color={
+                          order.status === "completed"
+                            ? "success"
+                            : order.status === "pending"
+                            ? "warning"
+                            : order.status === "in_progress"
+                            ? "info"
+                            : "default"
+                        }
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        component={Link}
+                        to={`/admin/orders/${order.order_id}`}
+                        variant="outlined"
+                        size="small"
+                        color="primary"
+                        sx={{
+                          textTransform: "none",
+                          borderRadius: "4px",
+                          mr: 1,
+                        }}
+                      >
+                        View
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        color="error"
+                        sx={{
+                          textTransform: "none",
+                          borderRadius: "4px",
+                        }}
+                        onClick={() => handleDeleteClick(order)}
+                      >
+                        Delete
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+
+          {totalPages > 1 && (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                mt: 3,
+                pb: 2,
+              }}
+            >
+              <Pagination
+                count={totalPages}
+                page={page}
+                onChange={handlePageChange}
+                color="primary"
+                shape="rounded"
+                showFirstButton
+                showLastButton
+                sx={{
+                  "& .MuiPaginationItem-root": {
+                    borderRadius: "4px",
+                  },
+                }}
+              />
+            </Box>
+          )}
+        </>
       )}
-    </div>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+      >
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          Are you sure you want to delete order #{orderToDelete?.order_id}?
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+          <Button onClick={handleConfirmDelete} color="error">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
   );
 };
 

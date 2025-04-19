@@ -68,24 +68,7 @@ const AdminMenu = () => {
             >
               <FaList className="mr-3" /> All Orders
             </Link>
-            <Link 
-              to="/admin/orders/pending" 
-              className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors !no-underline !text-black"
-            >
-              <FaSearch className="mr-3" /> Pending Orders
-            </Link>
-            <Link 
-              to="/admin/orders/completed" 
-              className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors !no-underline !text-black"
-            >
-              <FaCog className="mr-3" /> Completed Orders
-            </Link>
-            <Link 
-              to="/admin/orders/:id" 
-              className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors !no-underline !text-black"
-            >
-              <FaEdit className="mr-3" /> Update Status
-            </Link>
+      
           </div>
         )}
 

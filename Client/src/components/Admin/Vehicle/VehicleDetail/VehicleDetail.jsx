@@ -1,100 +1,173 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import vehicleService from "../../../../Service/vehicle.service";
+import customerService from "../../../../Service/customer.service"; // Import customer service
+import { Button, Card, Spinner, Alert, Badge } from "react-bootstrap";
 import { FaEdit, FaArrowLeft } from "react-icons/fa";
-import { Spinner } from "react-bootstrap";
+import { useAuth } from "../../../../Contexts/AuthContext";
 
 const VehicleDetail = () => {
-  const { vehicleId } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
+  const { employee } = useAuth();
   const [vehicle, setVehicle] = useState(null);
+  const [customer, setCustomer] = useState(null); // State for customer data
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [customerLoading, setCustomerLoading] = useState(false); // Loading state for customer fetch
 
   useEffect(() => {
-    const fetchVehicle = async () => {
+    const fetchVehicleAndCustomer = async () => {
       try {
-        const data = await vehicleService.getVehicleById(vehicleId);
-        setVehicle(data);
+        setLoading(true);
+        setError("");
+
+        // Get token from auth context
+        const token = employee?.employee_token;
+        if (!token) {
+          throw new Error("Authentication required");
+        }
+
+        // Fetch vehicle data
+        const vehicleData = await vehicleService.getVehicleById(id, token);
+
+        if (!vehicleData) {
+          throw new Error("Vehicle data not received");
+        }
+
+        setVehicle(vehicleData);
+
+        // If vehicle has a customer_id, fetch customer details
+        if (vehicleData.customer_id) {
+          setCustomerLoading(true);
+          try {
+            const customerData = await customerService.getCustomerById(
+              token,
+              vehicleData.customer_id
+            );
+            setCustomer(customerData);
+          } catch (customerError) {
+            console.error("Error fetching customer:", customerError);
+            // Continue even if customer fetch fails
+          } finally {
+            setCustomerLoading(false);
+          }
+        }
       } catch (err) {
-        setError("Failed to load vehicle details");
-        console.error(err);
+        console.error("Error in fetchVehicle:", err);
+        setError(err.message || "Failed to load vehicle details");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchVehicle();
-  }, [vehicleId]);
+    fetchVehicleAndCustomer();
+  }, [id, employee?.employee_token]);
 
   const handleEdit = () => {
-    navigate(`/vehicles/${vehicleId}/edit`);
+    navigate(`/admin/vehicles/edit/${id}`);
   };
 
   const handleBack = () => {
     navigate(-1);
   };
 
-  if (loading) return <Spinner animation="border" />;
-  if (error) return <div className="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg">{error}</div>;
-  if (!vehicle) return <div className="p-4 mb-4 text-sm text-yellow-700 bg-yellow-100 rounded-lg">Vehicle not found</div>;
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center mt-5">
+        <Spinner animation="border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </Spinner>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Alert variant="danger" className="mt-3">
+        {error}
+        <div className="mt-2">
+          <Button variant="link" onClick={() => window.location.reload()}>
+            Try Again
+          </Button>
+        </div>
+      </Alert>
+    );
+  }
+
+  if (!vehicle) {
+    return (
+      <Alert variant="warning" className="mt-3">
+        Vehicle not found
+      </Alert>
+    );
+  }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
-      <button
-        onClick={handleBack}
-        className="flex items-center px-4 py-2 mb-6 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-      >
-        <FaArrowLeft className="mr-2" />
+    <div className="container mt-4">
+      <Button variant="outline-secondary" onClick={handleBack} className="mb-3">
+        <FaArrowLeft className="me-2" />
         Back to Vehicles
-      </button>
+      </Button>
 
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="flex justify-between items-center p-6 border-b">
-          <h3 className="text-2xl font-bold text-gray-800">Vehicle Details</h3>
-          <button
-            onClick={handleEdit}
-            className="flex items-center px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <FaEdit className="mr-2" />
+      <Card>
+        <Card.Header className="d-flex justify-content-between align-items-center">
+          <h3 className="mb-0">Vehicle Details</h3>
+          <Button variant="primary" onClick={handleEdit}>
+            <FaEdit className="me-2" />
             Edit Vehicle
-          </button>
-        </div>
-
-        <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-            <div>
-              <h5 className="text-lg font-semibold mb-4 text-gray-700">Basic Information</h5>
-              <hr className="mb-4" />
-              <div className="space-y-3">
-                <p><span className="font-medium text-gray-700">Type:</span> {vehicle.vehicle_type_name}</p>
-                <p><span className="font-medium text-gray-700">Make:</span> {vehicle.make}</p>
-                <p><span className="font-medium text-gray-700">Model:</span> {vehicle.model}</p>
-                <p><span className="font-medium text-gray-700">Year:</span> {vehicle.year}</p>
-                <p className="flex items-center">
-                  <span className="font-medium text-gray-700">VIN:</span> 
-                  <span className="ml-2 px-2 py-1 text-xs font-medium bg-gray-200 rounded-md">{vehicle.VIN}</span>
-                </p>
-              </div>
+          </Button>
+        </Card.Header>
+        <Card.Body>
+          <div className="row mb-3">
+            <div className="col-md-6">
+              <h5>Basic Information</h5>
+              <hr />
+              <p>
+                <strong>Type:</strong> {vehicle.vehicle_type_name || "N/A"}
+              </p>
+              <p>
+                <strong>Make:</strong> {vehicle.make || "N/A"}
+              </p>
+              <p>
+                <strong>Model:</strong> {vehicle.model || "N/A"}
+              </p>
+              <p>
+                <strong>Year:</strong> {vehicle.year || "N/A"}
+              </p>
+              <p>
+                <strong>VIN:</strong>{" "}
+                <Badge bg="secondary">{vehicle.VIN || "N/A"}</Badge>
+              </p>
             </div>
-
-            <div>
-              <h5 className="text-lg font-semibold mb-4 text-gray-700">Ownership</h5>
-              <hr className="mb-4" />
-              <div className="space-y-3">
-                <p><span className="font-medium text-gray-700">Customer ID:</span> {vehicle.customer_id}</p>
-                <p><span className="font-medium text-gray-700">Vehicle ID:</span> {vehicle.vehicle_id}</p>
-              </div>
+            <div className="col-md-6">
+              <h5>Ownership</h5>
+              <hr />
+              <p>
+                <strong>Customer:</strong>{" "}
+                {customerLoading ? (
+                  <Spinner animation="border" size="sm" />
+                ) : customer ? (
+                  `${customer.first_name} ${customer.last_name}`
+                ) : (
+                  "N/A"
+                )}
+              </p>
+              <p>
+                <strong>Vehicle ID:</strong> {vehicle.vehicle_id || "N/A"}
+              </p>
             </div>
           </div>
 
-          <div>
-            <h5 className="text-lg font-semibold mb-4 text-gray-700">Service History</h5>
-            <hr className="mb-4" />
-            <p className="text-gray-500">No service history available.</p>
+          <div className="row">
+            <div className="col-12">
+              <h5>Service History</h5>
+              <hr />
+              <p className="text-muted">No service history available.</p>
+            </div>
           </div>
-        </div>
-      </div>
+        </Card.Body>
+      </Card>
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import AdminMenu from "../../components/Admin/Adminmenu/AdminMenu";
-import AddCustomerForm from "../../components/Admin/AddCustomer/AddCustomerForm";
+import AddCustomerForm from "../../components/Admin/Customer/AddCustomer/AddCustomerForm";
 
 function AddCustomer() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

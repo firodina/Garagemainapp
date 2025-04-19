@@ -166,6 +166,7 @@ const getVehiclesByCustomerId = async (req, res) => {
     res.status(500).json({ message: "Error fetching customer vehicles" });
   }
 };
+
 const updateVehicleType = async (req, res) => {
   const { id } = req.params;
   console.log(id)
@@ -203,5 +204,5 @@ module.exports = {
   deleteVehicle,
   getVehiclesByCustomerId,
   updateVehicleType,
-  deleteVehicleType,
+  deleteVehicleType
 };

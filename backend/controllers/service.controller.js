@@ -95,7 +95,6 @@ async function getServicesByOrderId(req, res) {
     res.status(500).json({ message: "Internal server error" });
   }
 }
-
 const updateServiceStatus = async (req, res) => {
   const { orderServiceId, status } = req.body;
   console.log("Received in controller:", { orderServiceId, status });
@@ -119,6 +118,9 @@ const updateServiceStatus = async (req, res) => {
   }
 };
 
+
+
+
 module.exports = {
   getAllServices,
   getServiceById,
@@ -126,6 +128,6 @@ module.exports = {
   updateService,
   deactivateService,
   getServicesByVehicleType,
-  updateServiceStatus,
   getServicesByOrderId,
+  updateServiceStatus,
 };

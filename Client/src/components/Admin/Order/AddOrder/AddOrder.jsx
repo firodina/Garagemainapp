@@ -184,161 +184,223 @@ const AddOrderForm = ({ customer_id, onCancel, onSuccess }) => {
   };
 
   if (!employee?.employee_token) return null;
-  if (loadingData) return <div>Loading customer vehicles...</div>;
+  
+  if (loadingData) {
+    return (
+      <div className="flex justify-center items-center h-32">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+        <span className="ml-3">Loading customer vehicles...</span>
+      </div>
+    );
+  }
 
   return (
-    <div className="mt-6 p-6 border rounded-lg bg-white shadow">
-      <h2 className="text-xl font-semibold mb-4">Create New Order</h2>
-      {error && <div className="text-red-500 mb-4">{error}</div>}
+    <div className="max-w-4xl mx-auto p-4 sm:p-6">
+      <div className="bg-white rounded-lg shadow-md p-6 sm:p-8">
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">Create New Order</h2>
+        
+        {error && (
+          <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+            <p className="text-red-700">{error}</p>
+          </div>
+        )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Order Date *
+              </label>
+              <input
+                type="date"
+                name="order_date"
+                value={formData.order_date}
+                onChange={handleInputChange}
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Select Vehicle *
+              </label>
+              <select
+                value={selectedVehicle}
+                onChange={(e) => setSelectedVehicle(e.target.value)}
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="">Select a vehicle</option>
+                {vehicles.map((v) => (
+                  <option key={v.vehicle_id} value={v.vehicle_id}>
+                    {v.make} {v.model} ({v.year}) - {v.plate_number}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
           <div>
-            <label className="block font-medium mb-1">Order Date</label>
-            <input
-              type="date"
-              name="order_date"
-              value={formData.order_date}
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Additional Request
+            </label>
+            <textarea
+              name="additional_request"
+              rows={3}
+              value={formData.additional_request}
               onChange={handleInputChange}
-              required
-              className="w-full border rounded px-3 py-2"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Any special requests or notes..."
             />
           </div>
 
-          <div>
-            <label className="block font-medium mb-1">Select Vehicle</label>
-            <select
-              value={selectedVehicle}
-              onChange={(e) => setSelectedVehicle(e.target.value)}
-              required
-              className="w-full border rounded px-3 py-2"
-            >
-              <option value="">Select a vehicle</option>
-              {vehicles.map((v) => (
-                <option key={v.vehicle_id} value={v.vehicle_id}>
-                  {v.make} {v.model} ({v.year}) - {v.plate_number}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
+          {selectedVehicle && (
+            <>
+              <div className="border-t border-gray-200 pt-4">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">Select Services</h3>
+                
+                {availableServices.length === 0 ? (
+                  <p className="text-gray-500 italic">No services available for this vehicle type.</p>
+                ) : (
+                  <div className="space-y-3">
+                    {availableServices.map((service) => {
+                      const isChecked = selectedServiceIds.includes(service.service_id);
+                      const isExpanded = expandedServiceIds.includes(service.service_id);
+                      const truncated = service.description.length > 100 && !isExpanded;
 
-        <div>
-          <label className="block font-medium mb-1">Additional Request</label>
-          <textarea
-            name="additional_request"
-            rows={2}
-            value={formData.additional_request}
-            onChange={handleInputChange}
-            className="w-full border rounded px-3 py-2"
-          />
-        </div>
-
-        {selectedVehicle && (
-          <>
-            <h3 className="text-lg font-semibold mt-4">Select Services</h3>
-            <div className="grid gap-3">
-              {availableServices.length === 0 && (
-                <p className="text-gray-500">
-                  No services available for this vehicle type.
-                </p>
-              )}
-              {availableServices.map((service) => {
-                const isChecked = selectedServiceIds.includes(service.service_id);
-                const isExpanded = expandedServiceIds.includes(service.service_id);
-                const truncated = service.description.length > 100 && !isExpanded;
-
-                return (
-                  <div
-                    key={service.service_id}
-                    className="flex items-start gap-2 border p-3 rounded"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={isChecked}
-                      onChange={() => handleServiceCheckboxChange(service.service_id)}
-                      className="mt-1"
-                    />
-                    <div>
-                      <label className="font-medium">
-                        {service.name} — ${service.price}
-                      </label>
-                      <p className="text-sm text-gray-600">
-                        {truncated
-                          ? service.description.slice(0, 100) + "..."
-                          : service.description}
-                      </p>
-                      {service.description.length > 100 && (
-                        <button
-                          type="button"
-                          className="text-blue-600 text-sm"
-                          onClick={(e) => toggleDescription(service.service_id, e)}
+                      return (
+                        <div
+                          key={service.service_id}
+                          className={`flex items-start p-3 border rounded-lg cursor-pointer ${isChecked ? 'border-blue-300 bg-blue-50' : 'border-gray-200 hover:bg-gray-50'}`}
+                          onClick={() => handleServiceCheckboxChange(service.service_id)}
                         >
-                          {isExpanded ? "Show Less" : "Read More"}
-                        </button>
-                      )}
-                    </div>
+                          <input
+                            type="checkbox"
+                            checked={isChecked}
+                            onChange={() => handleServiceCheckboxChange(service.service_id)}
+                            className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                          />
+                          <div className="ml-3 flex-1">
+                            <div className="flex justify-between items-start">
+                              <label className="block text-sm font-medium text-gray-700">
+                                {service.name} — <span className="text-blue-600">${service.price}</span>
+                              </label>
+                            </div>
+                            <p className="text-sm text-gray-600 mt-1">
+                              {truncated
+                                ? `${service.description.substring(0, 100)}...`
+                                : service.description}
+                            </p>
+                            {service.description.length > 100 && (
+                              <button
+                                type="button"
+                                className="text-sm text-blue-600 hover:text-blue-800 mt-1"
+                                onClick={(e) => toggleDescription(service.service_id, e)}
+                              >
+                                {isExpanded ? 'Show Less' : 'Read More'}
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
-                );
-              })}
+                )}
+              </div>
+
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={handleAddServices}
+                  disabled={isSubmitting || selectedServiceIds.length === 0}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Add Selected Services
+                </button>
+              </div>
+            </>
+          )}
+
+          {formData.services.length > 0 && (
+            <div className="border-t border-gray-200 pt-4">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">Selected Services</h3>
+              <div className="space-y-2">
+                {formData.services.map((service, index) => {
+                  const serviceInfo = availableServices.find(s => s.service_id === service.service_id) || {};
+                  return (
+                    <div
+                      key={index}
+                      className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border border-gray-200"
+                    >
+                      <div>
+                        <span className="font-medium text-gray-800">
+                          {serviceInfo.name || `Service #${service.service_id}`}
+                        </span>
+                        <span className="ml-2 text-blue-600">${service.price}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveService(index)}
+                        className="text-red-600 hover:text-red-800 text-sm font-medium"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
+          )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 border-t border-gray-200 pt-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Total Price
+              </label>
+              <div className="relative rounded-md shadow-sm">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <span className="text-gray-500 sm:text-sm">$</span>
+                </div>
+                <input
+                  type="text"
+                  name="order_total_price"
+                  value={formData.order_total_price.toFixed(2)}
+                  readOnly
+                  className="block w-full pl-7 pr-12 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end space-x-3 pt-6">
             <button
               type="button"
-              onClick={handleAddServices}
-              disabled={isSubmitting || selectedServiceIds.length === 0}
-              className="mt-3 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              onClick={onCancel}
+              className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
-              Add Services
+              Cancel
             </button>
-          </>
-        )}
-
-        {formData.services.length > 0 && (
-          <div>
-            <h3 className="text-lg font-semibold mt-4">Selected Services</h3>
-            <div className="space-y-2">
-              {formData.services.map((service, index) => (
-                <div
-                  key={index}
-                  className="flex justify-between items-center border p-3 rounded"
-                >
-                  <span>
-                    {service.name || `Service #${service.service_id}`} - ${service.price}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveService(index)}
-                    className="text-red-500 text-sm hover:underline"
-                  >
-                    Remove
-                  </button>
-                </div>
-              ))}
-            </div>
+            <button
+              type="submit"
+              disabled={isSubmitting || formData.services.length === 0}
+              className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isSubmitting ? (
+                <span className="flex items-center">
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Creating Order...
+                </span>
+              ) : (
+                'Create Order'
+              )}
+            </button>
           </div>
-        )}
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block font-medium mb-1">Total Price</label>
-            <input
-              type="number"
-              name="order_total_price"
-              value={formData.order_total_price}
-              readOnly
-              className="w-full border rounded px-3 py-2"
-            />
-          </div>
-        </div>
-
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full mt-4 bg-green-600 text-white py-2 rounded hover:bg-green-700"
-        >
-          {isSubmitting ? "Submitting..." : "Create Order"}
-        </button>
-      </form>
+        </form>
+      </div>
     </div>
   );
 };

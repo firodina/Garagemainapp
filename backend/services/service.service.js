@@ -151,7 +151,7 @@ const getServicesByVehicleType = async (vehicleTypeId) => {
   `;
 
   console.log(query);
-  const rows = await db.execute(query, [vehicleTypeId]);
+  const rows = await conn.query(query, [vehicleTypeId]);
   console.log(rows);
   return rows;
 };
@@ -210,6 +210,7 @@ const updateServiceStatus = async (orderServiceId, status) => {
 
   return { message: "Service status updated successfully" };
 };
+
 
 
 

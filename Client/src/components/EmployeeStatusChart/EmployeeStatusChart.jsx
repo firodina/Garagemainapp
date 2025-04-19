@@ -2,10 +2,9 @@ import React, { useEffect, useState } from "react";
 import { Pie } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
-// Register Chart.js components
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const EmployeeStatsChart = () => {
+const EmployeeStatusChart = ({ setActiveEmployeeCount }) => {
   const [chartData, setChartData] = useState(null);
 
   useEffect(() => {
@@ -16,8 +15,7 @@ const EmployeeStatsChart = () => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        console.log(data);
-
+        
         setChartData({
           labels: ["Active Employees", "Inactive Employees", "Total Employees"],
           datasets: [
@@ -42,13 +40,16 @@ const EmployeeStatsChart = () => {
             },
           ],
         });
+
+        // Passing active employee count to parent
+        setActiveEmployeeCount(data.data.activeEmployees);
       } catch (error) {
         console.error("Error fetching employee stats:", error);
       }
     };
 
     fetchEmployeeStats();
-  }, []);
+  }, [setActiveEmployeeCount]);
 
   const options = {
     responsive: true,
@@ -87,11 +88,9 @@ const EmployeeStatsChart = () => {
   return (
     <div className="bg-white border border-gray-300 rounded-xl p-6 h-[80vh] shadow-md">
       <h2 className="text-lg font-semibold text-gray-800 mb-4">Employee Statistics</h2>
-      <div className="">
-        <Pie data={chartData} options={options} />
-      </div>
+      <Pie data={chartData} options={options} />
     </div>
   );
 };
 
-export default EmployeeStatsChart;
+export default EmployeeStatusChart;

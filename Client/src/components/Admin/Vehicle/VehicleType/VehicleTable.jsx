@@ -1,20 +1,31 @@
 import React, { useEffect, useState } from "react";
 import vehicleService from "../../../../Service/vehicle.service";
+import { Table, Button, Spinner, Alert, Modal } from "react-bootstrap";
 import { FaEdit, FaTrash, FaInfoCircle } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../../../Contexts/AuthContext"; // Import auth context
 
 const VehicleTable = () => {
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [vehicleToDelete, setVehicleToDelete] = useState(null);
+  const navigate = useNavigate();
+  const { currentUser } = useAuth(); // Get current user from auth context
 
   useEffect(() => {
     const fetchVehicles = async () => {
       try {
-        const data = await vehicleService.getAllVehicles();
+        const token = currentUser?.token || localStorage.getItem("token");
+        // if (!token) {
+        //   throw new Error("Authentication required");
+        // }
+
+        const data = await vehicleService.getAllVehicles(token); // Pass token to service
         setVehicles(data);
       } catch (err) {
-        setError("Failed to load vehicles");
+        setError(err.message || "Failed to load vehicles");
         console.error(err);
       } finally {
         setLoading(false);
@@ -22,81 +33,118 @@ const VehicleTable = () => {
     };
 
     fetchVehicles();
-  }, []);
+  }, [currentUser]); // Add currentUser to dependencies
 
-  if (loading) return (
-    <div className="flex justify-center items-center h-64">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-    </div>
-  );
+  const handleEdit = (id) => {
+    // Check if user is authenticated before navigating
+    // if (!currentUser?.token && !localStorage.getItem("token")) {
+    //   setError("Please login to edit vehicles");
+    //   return;
+    // }
+    navigate(`/admin/vehicles/edit/${id}`); // Match your route structure
+  };
 
-  if (error) return (
-    <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4" role="alert">
-      <p>{error}</p>
-    </div>
-  );
+  const handleDeleteClick = (vehicle) => {
+    setVehicleToDelete(vehicle);
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      const token = currentUser?.token || localStorage.getItem("token");
+      // if (!token) {
+      //   throw new Error("Authentication required");
+      // }
+
+      await vehicleService.deleteVehicle(vehicleToDelete.vehicle_id, token);
+      setVehicles(
+        vehicles.filter((v) => v.vehicle_id !== vehicleToDelete.vehicle_id)
+      );
+      setShowDeleteModal(false);
+    } catch (err) {
+      setError(err.message || "Failed to delete vehicle");
+      console.error(err);
+    }
+  };
+
+  if (loading) return <Spinner animation="border" />;
+  if (error) return <Alert variant="danger">{error}</Alert>;
 
   return (
-    <div className="container mx-auto px-4 py-6">
-      <div className="flex justify-between items-center mb-6">
-        <h3 className="text-2xl font-semibold text-gray-800">All Vehicles</h3>
-        <Link 
-          to="/admin/vehicles/add" 
-          className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-150 ease-in-out"
-        >
-          Add New Vehicle
+    <div className="vehicle-table-container">
+      <div className="table-header">
+        <h3>All Vehicles</h3>
+        <Link to="/admin/vehicles/add">
+          <Button variant="primary">Add New Vehicle</Button>
         </Link>
       </div>
 
-      <div className="overflow-x-auto shadow-md rounded-lg">
-        <table className="min-w-full bg-white border-collapse">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-              <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-              <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Make</th>
-              <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Model</th>
-              <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Year</th>
-              <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+      <Table striped bordered hover responsive>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Type</th>
+            <th>Make</th>
+            <th>Model</th>
+            <th>Year</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {vehicles.map((vehicle) => (
+            <tr key={vehicle.vehicle_id}>
+              <td>{vehicle.vehicle_id}</td>
+              <td>{vehicle.vehicle_type_name}</td>
+              <td>{vehicle.make}</td>
+              <td>{vehicle.model}</td>
+              <td>{vehicle.year}</td>
+              <td className="actions-cell">
+                <Link to={`/admin/vehicles/${vehicle.vehicle_id}`}>
+                  <Button variant="info" size="sm" title="View Details">
+                    <FaInfoCircle />
+                  </Button>
+                </Link>
+                <Button
+                  variant="warning"
+                  size="sm"
+                  title="Edit"
+                  className="mx-2"
+                  onClick={() => handleEdit(vehicle.vehicle_id)}
+                >
+                  <FaEdit />
+                </Button>
+                <Button
+                  variant="danger"
+                  size="sm"
+                  title="Delete"
+                  onClick={() => handleDeleteClick(vehicle)}
+                >
+                  <FaTrash />
+                </Button>
+              </td>
             </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {vehicles.map((vehicle) => (
-              <tr key={vehicle.vehicle_id} className="hover:bg-gray-50">
-                <td className="py-4 px-6 whitespace-nowrap text-sm text-gray-900">{vehicle.vehicle_id}</td>
-                <td className="py-4 px-6 whitespace-nowrap text-sm text-gray-900">{vehicle.vehicle_type_name}</td>
-                <td className="py-4 px-6 whitespace-nowrap text-sm text-gray-900">{vehicle.make}</td>
-                <td className="py-4 px-6 whitespace-nowrap text-sm text-gray-900">{vehicle.model}</td>
-                <td className="py-4 px-6 whitespace-nowrap text-sm text-gray-900">{vehicle.year}</td>
-                <td className="py-4 px-6 whitespace-nowrap text-sm text-gray-900">
-                  <div className="flex space-x-2">
-                    <Link 
-                      to={`/admin/vehicles/${vehicle.vehicle_id}`}
-                      className="bg-blue-100 hover:bg-blue-200 text-blue-800 p-2 rounded-md transition duration-150 ease-in-out"
-                      title="View Details"
-                    >
-                      <FaInfoCircle />
-                    </Link>
-                    <Link 
-                      to={`/admin/vehicles/${vehicle.vehicle_id}/edit`}
-                      className="bg-yellow-100 hover:bg-yellow-200 text-yellow-800 p-2 rounded-md transition duration-150 ease-in-out"
-                      title="Edit"
-                    >
-                      <FaEdit />
-                    </Link>
-                    <button
-                      className="bg-red-100 hover:bg-red-200 text-red-800 p-2 rounded-md transition duration-150 ease-in-out"
-                      title="Delete"
-                    >
-                      <FaTrash />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+          ))}
+        </tbody>
+      </Table>
+
+      {/* Delete Confirmation Modal */}
+      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Delete</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to delete this vehicle? This action cannot be
+          undone.
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={handleConfirmDelete}>
+            Delete
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
