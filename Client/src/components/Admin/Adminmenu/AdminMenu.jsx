@@ -16,6 +16,8 @@ import {
   FaFileInvoiceDollar,
   FaSearch,
   FaEdit,
+  FaCalendarAlt,
+  FaHome,
 } from "react-icons/fa";
 
 const AdminMenu = () => {
@@ -204,6 +206,18 @@ const AdminMenu = () => {
           className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors !no-underline !text-black"
         >
           <FaCog className="mr-3" /> Settings
+        </Link>
+        <Link 
+          to="/admin/appointments" 
+          className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors !no-underline !text-black"
+        >
+          <FaCalendarAlt className="mr-3" /> Appointments
+        </Link>
+        <Link 
+          to="/admin/house-to-house" 
+          className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors !no-underline !text-black"
+        >
+          <FaHome className="mr-3" /> House to House List 
         </Link>
       </div>
     </div>

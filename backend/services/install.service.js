@@ -34,16 +34,21 @@ async function install() {
       await conn.query(queries[i]);
       console.log("✅ Table created successfully.");
     } catch (err) {
-      console.error("❌ Error creating table:", err.message, "\nQuery:", queries[i]);
+      console.error(
+        "❌ Error creating table:",
+        err.message,
+        "\nQuery:",
+        queries[i]
+      );
       finalMessage.message = "Not all tables were created.";
       break; // Exit the loop after the first error
     }
   }
 
-  finalMessage.message = finalMessage.message || "All tables created successfully.";
+  finalMessage.message =
+    finalMessage.message || "All tables created successfully.";
   finalMessage.status = finalMessage.message.includes("Not all") ? 500 : 200;
   return finalMessage;
 }
-
 
 module.exports = { install };

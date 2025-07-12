@@ -64,7 +64,7 @@ function Login() {
               navigate("/employee");
               break;
           default:
-              navigate("/"); // Fallback to home if role not recognized
+              navigate("/admin"); // Fallback to home if role not recognized
               break;
       }
       } else {

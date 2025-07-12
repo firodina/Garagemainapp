@@ -79,12 +79,16 @@ CREATE TABLE IF NOT EXISTS customer_interactions (
 CREATE TABLE IF NOT EXISTS orders (
   order_id INT AUTO_INCREMENT PRIMARY KEY,
   customer_id INT NOT NULL,
+  vehicle_id INT NOT NULL, -- ✅ Add this line
   employee_id INT DEFAULT NULL, 
   order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   total_price DECIMAL(10,2) NOT NULL,
+
   FOREIGN KEY (customer_id) REFERENCES customer_identifier(customer_id),
+  FOREIGN KEY (vehicle_id) REFERENCES vehicles(vehicle_id), -- ✅ Add this FK constraint
   FOREIGN KEY (employee_id) REFERENCES employee(employee_id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
+
 
 CREATE TABLE IF NOT EXISTS order_status (
   order_status_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -94,13 +98,15 @@ CREATE TABLE IF NOT EXISTS order_status (
   FOREIGN KEY (order_id) REFERENCES orders(order_id)
 ) ENGINE=InnoDB;
 
--- Merge tasks and order_tasks into a single table
+
 CREATE TABLE IF NOT EXISTS tasks (
   task_id INT AUTO_INCREMENT PRIMARY KEY,
   order_id INT DEFAULT NULL,
   assigned_to INT NOT NULL,
   task_details TEXT NOT NULL,
   task_status ENUM('Pending', 'In Progress', 'Completed') NOT NULL DEFAULT 'Pending',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (order_id) REFERENCES orders(order_id),
   FOREIGN KEY (assigned_to) REFERENCES employee(employee_id)
 ) ENGINE=InnoDB;

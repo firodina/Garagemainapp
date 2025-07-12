@@ -19,6 +19,7 @@ const AddServiceForm = () => {
     description: "",
     price: "",
     vehicle_type_name: "",
+    duration: "", // Added duration field
   });
   const [vehicleTypes, setVehicleTypes] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -26,7 +27,7 @@ const AddServiceForm = () => {
   const [error, setError] = useState("");
   const [vehicleTypesError, setVehicleTypesError] = useState("");
   const [success, setSuccess] = useState(false);
-  const [expanded, setExpanded] = useState(false); // New state for expanded description
+  const [expanded, setExpanded] = useState(false);
   const { employee } = useAuth();
 
   useEffect(() => {
@@ -36,9 +37,6 @@ const AddServiceForm = () => {
         const response = await vehicleService.getAllVehicleTypes(
           employee?.employee_token
         );
-
-        console.log("API Response:", response);
-        console.log("Token:", employee?.employee_token);
 
         const types = Array.isArray(response) ? response : [];
         setVehicleTypes(types);
@@ -89,8 +87,9 @@ const AddServiceForm = () => {
         description: "",
         price: "",
         vehicle_type_name: "",
+        duration: "", // Reset duration
       });
-      setExpanded(false); // Reset expanded state on success
+      setExpanded(false);
     } catch (err) {
       setError(err.response?.data?.error || "Failed to create service");
     } finally {
@@ -140,12 +139,12 @@ const AddServiceForm = () => {
                   <Form.Label>Description</Form.Label>
                   <Form.Control
                     as="textarea"
-                    rows={expanded ? 6 : 3} // Dynamic row count
+                    rows={expanded ? 6 : 3}
                     name="description"
                     value={formData.description}
                     onChange={handleChange}
-                    onClick={toggleDescription} // Toggle on click
-                    onBlur={() => setExpanded(false)} // Collapse when focus is lost
+                    onClick={toggleDescription}
+                    onBlur={() => setExpanded(false)}
                     style={{
                       transition: "height 0.3s ease",
                       minHeight: expanded ? "150px" : "auto",
@@ -202,6 +201,20 @@ const AddServiceForm = () => {
                       ))}
                     </Form.Select>
                   )}
+                </Form.Group>
+              </Col>
+
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Duration (minutes)</Form.Label>
+                  <Form.Control
+                    type="number"
+                    name="duration"
+                    value={formData.duration}
+                    onChange={handleChange}
+                    min="0"
+                    required
+                  />
                 </Form.Group>
               </Col>
 

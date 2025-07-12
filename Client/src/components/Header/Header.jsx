@@ -1,42 +1,60 @@
 import { useAuth } from "../../Contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
-import { FaUserCircle, FaEdit, FaChevronDown, FaBars, FaTimes } from "react-icons/fa";
-import { useState } from "react";
+import {
+  FaUserCircle,
+  FaEdit,
+  FaChevronDown,
+  FaBars,
+  FaTimes,
+} from "react-icons/fa";
+import { useState, useRef } from "react";
 
 function Header() {
-  const { isLogged, isCustomerLogged, employee, logout } = useAuth();
+  const { isLogged, isCustomerLogged, logout } = useAuth();
   const navigate = useNavigate();
+
+  // --- state ---
   const [isOpen, setIsOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState({
     about: false,
     services: false,
+    user: false,
+    aboutMobile: false,
+    servicesMobile: false,
   });
+
+  // --- helpers ---
+  const closeDesktop = () =>
+    setDropdownOpen((p) => ({
+      ...p,
+      about: false,
+      services: false,
+      user: false,
+    }));
+
+  const openDesktop = (key) =>
+    setDropdownOpen((p) => ({ ...p, [key]: true }));
+
+  const toggleDropdown = (key) =>
+    setDropdownOpen((p) => ({ ...p, [key]: !p[key] }));
 
   const handleLogout = () => {
     logout();
     navigate("/");
   };
 
-  const toggleDropdown = (menu) => {
-    setDropdownOpen(prev => ({
-      ...prev,
-      [menu]: !prev[menu]
-    }));
-  };
-
+  /* ---------- JSX ---------- */
   return (
     <header className="bg-white shadow-md sticky top-0 w-full z-50">
       <div className="container mx-auto px-4 py-2">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center">
-            <img
-              onClick={() => navigate("/")}
-              src="https://orbistrading-ethiopia.com/images/orlogo_2.png"
-              alt="Logo"
-              className="h-12 cursor-pointer"
-            />
-          </div>
+          <img
+            onClick={() => navigate("/")}
+            src="https://orbistrading-ethiopia.com/images/orlogo_2.png"
+            alt="Logo"
+            className="h-12 cursor-pointer"
+          />
 
           {/* Mobile menu button */}
           <div className="lg:hidden">
@@ -57,12 +75,13 @@ function Header() {
               Home
             </Link>
 
-            {/* About Us Dropdown */}
-            <div className="relative">
-              <button
-                onClick={() => toggleDropdown('about')}
-                className="text-[#E10600] font-bold hover:text-[#E10600]/80 flex items-center"
-              >
+            {/* About Us */}
+            <div
+              className="relative"
+              onMouseEnter={() => openDesktop("about")}
+              onMouseLeave={closeDesktop}
+            >
+              <button className="text-[#E10600] font-bold hover:text-[#E10600]/80 flex items-center">
                 About Us <FaChevronDown className="ml-1" size={12} />
               </button>
               {dropdownOpen.about && (
@@ -83,12 +102,13 @@ function Header() {
               )}
             </div>
 
-            {/* Services Dropdown */}
-            <div className="relative">
-              <button
-                onClick={() => toggleDropdown('services')}
-                className="text-[#E10600] font-bold hover:text-[#E10600]/80 flex items-center"
-              >
+            {/* Services */}
+            <div
+              className="relative"
+              onMouseEnter={() => openDesktop("services")}
+              onMouseLeave={closeDesktop}
+            >
+              <button className="text-[#E10600] font-bold hover:text-[#E10600]/80 flex items-center">
                 Services <FaChevronDown className="ml-1" size={12} />
               </button>
               {dropdownOpen.services && (
@@ -101,19 +121,19 @@ function Header() {
                   </Link>
                   <Link
                     to="/schedule"
-                    className="block px-4 py-2 text-gray-800 hover:bg-gray-100 no-underline !no-underline"
+                    className="block px-4 py-2 text-gray-800 hover:bg-gray-100 !no-underline"
                   >
                     Online Booking
                   </Link>
                   <Link
                     to="/maintenance"
-                    className="block px-4 py-2 !text-gray-800 hover:bg-gray-100 !no-underline"
+                    className="block px-4 py-2 text-gray-800 hover:bg-gray-100 !no-underline"
                   >
                     Body Painting and Maintenance
                   </Link>
                   <Link
                     to="/HtoH"
-                    className="block px-4 py-2 !text-gray-800 hover:bg-gray-100 !no-underline"
+                    className="block px-4 py-2 text-gray-800 hover:bg-gray-100 !no-underline"
                   >
                     House to House request
                   </Link>
@@ -129,12 +149,12 @@ function Header() {
             </Link>
           </nav>
 
-          {/* Auth Section */}
+          {/* Auth (desktop) */}
           <div className="hidden lg:block">
-            {isLogged ? (
+            {isLogged || isCustomerLogged ? (
               <div className="relative">
                 <button
-                  onClick={() => toggleDropdown('user')}
+                  onClick={() => toggleDropdown("user")}
                   className="text-[#E10600] focus:outline-none"
                 >
                   <FaUserCircle size={30} />
@@ -144,7 +164,7 @@ function Header() {
                     <button
                       onClick={() => {
                         navigate("/edit-profile");
-                        setDropdownOpen({ ...dropdownOpen, user: false });
+                        closeDesktop();
                       }}
                       className="flex items-center px-4 py-2 text-gray-800 hover:bg-gray-100 w-full text-left"
                     >
@@ -183,9 +203,10 @@ function Header() {
                 Home
               </Link>
 
+              {/* About (mobile) */}
               <div>
                 <button
-                  onClick={() => toggleDropdown('aboutMobile')}
+                  onClick={() => toggleDropdown("aboutMobile")}
                   className="text-[#E10600] font-bold hover:text-[#E10600]/80 flex items-center"
                 >
                   About Us <FaChevronDown className="ml-1" size={12} />
@@ -210,9 +231,10 @@ function Header() {
                 )}
               </div>
 
+              {/* Services (mobile) */}
               <div>
                 <button
-                  onClick={() => toggleDropdown('servicesMobile')}
+                  onClick={() => toggleDropdown("servicesMobile")}
                   className="text-[#E10600] font-bold hover:text-[#E10600]/80 flex items-center"
                 >
                   Services <FaChevronDown className="ml-1" size={12} />
@@ -259,8 +281,9 @@ function Header() {
                 Contact Us
               </Link>
 
+              {/* Auth (mobile) */}
               <div className="pt-4">
-                {isLogged && isCustomerLogged? (
+                {isLogged || isCustomerLogged ? (
                   <div className="space-y-2">
                     <button
                       onClick={() => {

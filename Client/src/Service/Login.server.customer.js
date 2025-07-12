@@ -7,7 +7,7 @@ const customerLogIn = async (formData) => {
     };
 
     try {
-        const response = await fetch("http://localhost:3000/api/customer/login", requestOptions);
+        const response = await fetch("http://localhost:3005/api/customer/login", requestOptions);
 
         if (response.ok) {
             return response; // Return customer response if successful

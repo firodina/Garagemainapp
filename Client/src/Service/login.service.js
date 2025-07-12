@@ -8,13 +8,13 @@ const logIn = async (formData) => {
       body: JSON.stringify(formData),
     };
     const response = await fetch(
-      `http://localhost:3000/api/employee/login`,
+      `http://localhost:3005/api/employee/login`,
       requestOptions
     );
     if (!response.ok) 
         {
       const response2 = await fetch(
-        `http://localhost:3000/api/customer/login`,
+        `http://localhost:3005/api/customer/login`,
         requestOptions
       );
       if (!response2.ok) {

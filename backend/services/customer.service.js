@@ -29,7 +29,7 @@ async function addCustomer(customerData, isAdmin) {
     phone,
     address,
     registered_at,
-    password, 
+    password,
   } = customerData;
 
   const approved = isAdmin ? 1 : 0;
@@ -38,25 +38,16 @@ async function addCustomer(customerData, isAdmin) {
   try {
     await connection.beginTransaction();
 
-    // Hash the password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Fix: Convert registered_at to MySQL-compatible format
-    const mysqlRegisteredAt = new Date(registered_at)
-      .toISOString()
-      .slice(0, 19)
-      .replace('T', ' ');
-
-    // Insert into customer_identifier table
     const [resultIdentifier] = await connection.query(
       insertCustomerIdentifierQuery,
-      [4, email, phone, mysqlRegisteredAt, approved]
+      [4, email, phone, registered_at, approved]
     );
 
     const customer_id = resultIdentifier.insertId;
 
-    // Insert into customer_info table
     await connection.query(insertCustomerInfoQuery, [
       customer_id,
       first_name,
@@ -64,13 +55,13 @@ async function addCustomer(customerData, isAdmin) {
       address,
     ]);
 
-    // Insert hashed password into customer_pass table
     await connection.query(insertCustomerPassQuery, [
       customer_id,
       hashedPassword,
     ]);
 
     await connection.commit();
+
     return {
       customer_id,
       first_name,
@@ -270,6 +261,52 @@ async function getCustomerStatus() {
     return error;
   }
 }
+const getCustomersByApprovalStatus = async (status) => {
+  const rows = await db.query(
+    ` SELECT 
+  ci.customer_id,
+  ci.email,
+  ci.phone,
+  ci.registered_at,
+  ci.approved,
+  info.first_name,
+  info.last_name,
+  info.address
+FROM 
+  customer_identifier ci
+JOIN 
+  customer_info info ON ci.customer_id = info.customer_id
+WHERE 
+  ci.approved = FALSE;`,
+    [status]
+  );
+  return rows;
+};
+
+const approveCustomer = async (customerId) => {
+  try {
+    const result = await db.query(
+      "UPDATE customer_identifier SET approved = TRUE WHERE customer_id = ?",
+      [customerId]
+    );
+
+    if (result.affectedRows === 0) {
+      throw new Error("Customer not found");
+    }
+
+    return result;
+  } catch (error) {
+    console.error("Error in approveCustomer service:", error);
+    throw error;
+  }
+};
+
+const unapproveCustomer = async (customerId) => {
+  const query =
+    "UPDATE customer_identifier SET approved = 0 WHERE customer_id = ?";
+  const result = await db.execute(query, [customerId]); // use `execute` if using mysql2 or promise-based db
+  return result;
+};
 
 // Export all services
 module.exports = {
@@ -280,4 +317,7 @@ module.exports = {
   deleteCustomer,
   getCustomerByEmail,
   getCustomerStatus,
+  getCustomersByApprovalStatus,
+  approveCustomer,
+  unapproveCustomer,
 };

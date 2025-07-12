@@ -18,7 +18,7 @@ const createVehicleType = async (vehicleTypeName) => {
 const getAllVehicleTypes = async () => {
   const query = "SELECT * FROM vehicle_types ORDER BY vehicle_type_name";
   try {
-    const rows = await conn.query(query); 
+    const rows = await conn.query(query);
     console.log("SQL Results (All Vehicles):", rows); // Debug log
     return rows; // Returns ALL vehicle types
   } catch (error) {
@@ -200,10 +200,8 @@ const updateVehicleType = async (id, name) => {
   const result = await conn.query(
     "UPDATE vehicle_types SET vehicle_type_name = ? WHERE vehicle_type_id = ?",
     [name, id]
-
-   
   );
-   
+
   return result;
 };
 

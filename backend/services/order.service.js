@@ -55,7 +55,6 @@ async function createOrder(orderData) {
   return { order_id, status: order_status };
 }
 
-
 const getAllOrders = async () => {
   const orders = await conn.query(`
     SELECT o.*, c.first_name, c.last_name, os.status, os.updated_at
@@ -64,7 +63,7 @@ const getAllOrders = async () => {
     LEFT JOIN order_status os ON o.order_id = os.order_id
     ORDER BY o.order_id DESC
   `);
-  console.log(orders)
+
   return orders;
 };
 
@@ -110,7 +109,7 @@ const updateOrderStatus = async (orderId, newStatus) => {
 };
 
 const getOrdersByCustomerId = async (customerId) => {
-  const [rows] = await conn.query(
+  const rows = await conn.query(
     `SELECT 
       o.order_id,
       o.customer_id,
@@ -127,10 +126,6 @@ const getOrdersByCustomerId = async (customerId) => {
   );
   return rows;
 };
-
-
-
-
 
 module.exports = {
   createOrder,

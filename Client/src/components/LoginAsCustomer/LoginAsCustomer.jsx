@@ -5,7 +5,7 @@ import { useAuth } from "../../Contexts/AuthContext";
 
 function CustomerLogin() {
     const navigate = useNavigate();
-    const { setIsCustomerLogged, setCustomer } = useAuth(); // Corrected destructuring
+    const { setIsCustomerLogged, setCustomer } = useAuth();
     const [customer_email, setEmail] = useState("");
     const [customer_password, setPassword] = useState("");
     const [emailError, setEmailError] = useState("");
@@ -16,7 +16,6 @@ function CustomerLogin() {
         event.preventDefault();
         let valid = true;
 
-        // Trim input values
         const trimmedEmail = customer_email.trim();
         const trimmedPassword = customer_password.trim();
 
@@ -49,27 +48,20 @@ function CustomerLogin() {
 
         try {
             const response = await customerLogIn(formData);
-            const data = await response.json();
+            const data = await response.json(); // Ensure response is parsed correctly
 
             if (response.ok) {
-                // Store customer info and update context
                 localStorage.setItem("customer", JSON.stringify(data.data));
-                setIsCustomerLogged(true); // Corrected: using the setter function
+                setIsCustomerLogged(true);
                 setCustomer(data.data);
-
-                // Redirect to the customer dashboard
                 navigate("/customer");
             } else {
-                const errorMessages = {
-                    "Incorrect password": "Incorrect password",
-                    "Customer does not exist": "Customer does not exist",
-                };
-
                 setServerError(data.message || "An unexpected error occurred.");
-
-                if (errorMessages[data.message]) {
-                    setPasswordError(errorMessages[data.message]);
-                    setEmailError(data.message === "Customer does not exist" ? errorMessages[data.message] : "");
+                // Handle specific error messages
+                if (data.message === "Incorrect password") {
+                    setPasswordError("Incorrect password");
+                } else if (data.message === "Customer does not exist") {
+                    setEmailError("Customer does not exist");
                 }
             }
         } catch (err) {

@@ -1,8 +1,21 @@
 const conn = require("../config/db.config");
 
 async function getAllServices() {
-  const query =
-    "SELECT st.*, sp.price, vt.vehicle_type_name FROM service_types st LEFT JOIN service_pricing sp ON st.service_type_id = sp.service_type_id LEFT JOIN vehicle_types vt ON sp.vehicle_type_id = vt.vehicle_type_id";
+  const query = `
+    SELECT 
+      st.service_type_id,
+      st.service_name,
+      st.description,
+      st.duration,             
+      sp.price,
+      vt.vehicle_type_name 
+    FROM 
+      service_types st 
+    LEFT JOIN 
+      service_pricing sp ON st.service_type_id = sp.service_type_id 
+    LEFT JOIN 
+      vehicle_types vt ON sp.vehicle_type_id = vt.vehicle_type_id
+  `;
   const rows = await conn.query(query);
   return rows;
 }
@@ -14,7 +27,7 @@ async function getServiceById(serviceId) {
 }
 
 async function createService(serviceData) {
-  const { service_name, description, price, vehicle_type_name } = serviceData;
+  const { service_name, description, price, vehicle_type_name, duration } = serviceData; // Include duration
 
   // Retrieve the vehicle type ID from the vehicle_types table
   const vehicleTypeQuery =
@@ -45,7 +58,7 @@ async function createService(serviceData) {
       // Update the existing pricing record
       const updatePricingQuery =
         "UPDATE service_pricing SET price = ? WHERE service_type_id = ? AND vehicle_type_id = ?";
-      const updatePricingResult = await conn.query(updatePricingQuery, [
+      await conn.query(updatePricingQuery, [
         price,
         existingServiceResult[0].service_type_id,
         vehicleTypeId,
@@ -55,7 +68,7 @@ async function createService(serviceData) {
       // Create a new pricing record
       const createPricingQuery =
         "INSERT INTO service_pricing (service_type_id, vehicle_type_id, price) VALUES (?, ?, ?)";
-      const createPricingResult = await conn.query(createPricingQuery, [
+      await conn.query(createPricingQuery, [
         existingServiceResult[0].service_type_id,
         vehicleTypeId,
         price,
@@ -65,15 +78,15 @@ async function createService(serviceData) {
   } else {
     // Create a new service and pricing record
     const query1 =
-      "INSERT INTO service_types (service_name, description) VALUES (?, ?)";
+      "INSERT INTO service_types (service_name, description, duration) VALUES (?, ?, ?)"; // Include duration
     const query2 =
       "INSERT INTO service_pricing (service_type_id, vehicle_type_id, price) VALUES (?, ?, ?)";
 
     try {
-      const result1 = await conn.query(query1, [service_name, description]);
+      const result1 = await conn.query(query1, [service_name, description, duration]); // Pass duration
       const serviceTypeId = result1.insertId;
 
-      const result2 = await conn.query(query2, [
+      await conn.query(query2, [
         serviceTypeId,
         vehicleTypeId,
         price,
@@ -165,7 +178,8 @@ async function getServicesByOrderId(orderId) {
       st.service_name,
       st.description,
       sp.price,
-      vt.vehicle_type_name
+      vt.vehicle_type_name,
+    os.service_status
     FROM 
       order_services os
     JOIN 
@@ -183,9 +197,8 @@ async function getServicesByOrderId(orderId) {
 }
 
 const updateServiceStatus = async (orderServiceId, status) => {
-  console.log("Service Layer Params:", { orderServiceId, status }); // Add this
+  console.log("Service Layer Params:", { orderServiceId, status });
 
-  // 👇 Add this line to catch undefined values early
   if (orderServiceId === undefined || status === undefined) {
     throw new Error("orderServiceId or status is undefined before DB query");
   }
@@ -208,8 +221,22 @@ const updateServiceStatus = async (orderServiceId, status) => {
   `;
   await conn.query(updateServiceSql, [newServiceStatus, orderServiceId]);
 
-  return { message: "Service status updated successfully" };
+  // Now fetch the updated service row:
+  const selectUpdatedServiceSql = `
+    SELECT * FROM order_services WHERE order_service_id = ?
+  `;
+  const [rows] = await conn.query(selectUpdatedServiceSql, [orderServiceId]);
+
+  if (rows.length === 0) {
+    throw new Error("Updated service not found");
+  }
+
+  console.log(rows);
+  return rows; // Return the updated service data
 };
+
+
+
 
 
 

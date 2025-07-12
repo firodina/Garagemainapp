@@ -67,9 +67,15 @@ import OrderDetailCard from "./Pages/admin/Order/OrderDetailCard";
 // Admin - Customer Profile
 import CustomerPage from "./Pages/CustomerProfile";
 import CustomerUpdatePage from "./Pages/admin/CustmerUpdatePage";
+import AppointmentList from "./Pages/admin/AppointmentList";
 
 function App() {
-  const { userType, isCustomerLogged } = useAuth();
+  const { userType, isCustomerLogged, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <div>Loading...</div>; // Show loading until auth state is ready
+  }
+
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -121,6 +127,7 @@ function App() {
                   <Route path="/admin/customers" element={<Customers />} />
                   <Route path="/admin/customer/profile/:customerId" element={<CustomerPage />} />
                   <Route path="/admin/customer/:customerId" element={<CustomerUpdatePage />} />
+                  <Route path="/admin/appointments" element={< AppointmentList />} />
 
                   {/* Admin - Services */}
                   <Route path="/admin/services/add" element={<AddServices />} />

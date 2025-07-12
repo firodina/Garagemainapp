@@ -22,6 +22,9 @@ const serviceRouter = require("./service.routes");
 // Import the order routes
 const orderRouter = require("./order.routes");
 
+// import the appointment routes
+const appointmentRouter = require("./appointment.routes");
+
 
 
 // Add routes
@@ -40,6 +43,9 @@ router.use(serviceRouter);
 
 // Add the order routes to the main router
 router.use(orderRouter);
+
+// Add the appointment routes to the main router
+router.use(appointmentRouter);
 
 // Export the router correctly
 module.exports = router;

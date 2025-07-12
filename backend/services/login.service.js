@@ -1,7 +1,6 @@
 const bcrypt = require("bcrypt");
 const employeeService = require("./employee.service");
 const customerService = require("./customer.service");
-// const { getCustomerByEmail } = require("./customer.service");
 
 async function logIn(employeeData) {
   try {
@@ -34,71 +33,73 @@ async function logIn(employeeData) {
     return {
       status: "success",
       data: employee[0],
-      statusCode: 200, // OK
+      statusCode: 200,
     };
   } catch (error) {
     console.log(error);
     return {
       status: "error",
       message: "An internal error occurred",
-      statusCode: 500, // Internal Server Error
+      statusCode: 500,
     };
   }
 }
 
-
-
-async function customerLogIn(customerData) {
+async function logInCustomer(CustomerData) {
   try {
-    const { email, password } = customerData;
-    let returnData = {}; // Object to be returned
+    let returnData = {};
 
-    // Fetch customer by email
-    const customer = await customerService.getCustomerByEmail(email);
+    const Customer = await customerService.getCustomerByEmail(
+      CustomerData.customer_email
+    );
 
-    if (!customer) {
-      return {
+    if (!Customer) {
+      returnData = {
         status: "fail",
         message: "Customer does not exist",
-        statusCode: 404, // Not Found
       };
+      return returnData;
     }
 
-    // Compare the provided password with the hashed password
-    const passwordMatch = await bcrypt.compare(password, customer.password_hash);
+    if (Customer.approved !== 1) {
+      returnData = {
+        status: "fail",
+        message:
+          "Your account is not approved yet. Please wait for admin approval.",
+      };
+      return returnData;
+    }
+
+    if (!CustomerData.customer_password || !Customer.password_hash) {
+      returnData = {
+        status: "fail",
+        message: "Missing password data",
+      };
+      return returnData;
+    }
+
+    const passwordMatch = await bcrypt.compare(
+      CustomerData.customer_password,
+      Customer.password_hash
+    );
 
     if (!passwordMatch) {
-      return {
+      returnData = {
         status: "fail",
         message: "Incorrect password",
-        statusCode: 401, // Unauthorized
       };
+      return returnData;
     }
 
-    // Login successful
-    return {
+    returnData = {
       status: "success",
-      data: {
-        customer_id: customer.customer_id,
-        email: customer.email,
-        first_name: customer.first_name,
-        last_name: customer.last_name,
-        // Add other fields as needed
-      },
-      statusCode: 200, // OK
+      data: Customer,
     };
+    return returnData;
   } catch (error) {
-    console.error("Error during customer login:", error);
-    return {
-      status: "error",
-      message: "An internal error occurred",
-      statusCode: 500, // Internal Server Error
-    };
+    console.log("Login error:", error);
+    throw error;
   }
 }
 
-
-
-module.exports = { logIn 
-  ,customerLogIn
-};
+module.exports = { logIn, logInCustomer };
