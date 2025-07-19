@@ -169,7 +169,7 @@ const getVehiclesByCustomerId = async (req, res) => {
 
 const updateVehicleType = async (req, res) => {
   const { id } = req.params;
-  console.log(id)
+  console.log(id);
   const { vehicle_type_name } = req.body;
   console.log(vehicle_type_name);
 
@@ -193,7 +193,6 @@ const deleteVehicleType = async (req, res) => {
   }
 };
 
-
 module.exports = {
   createVehicleType,
   getAllVehicleTypes,
@@ -204,5 +203,5 @@ module.exports = {
   deleteVehicle,
   getVehiclesByCustomerId,
   updateVehicleType,
-  deleteVehicleType
+  deleteVehicleType,
 };

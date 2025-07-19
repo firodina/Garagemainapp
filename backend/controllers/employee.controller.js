@@ -1,4 +1,3 @@
-
 //import employee service
 const employeeService = require("../services/employee.service");
 
@@ -9,7 +8,9 @@ const createEmployee = async (req, res) => {
   // Check if the required fields are present
   if (!req.body.employee_email) {
     console.log("Error: employee_email is undefined!");
-    return res.status(400).json({ error: "Missing required field: employee_email" });
+    return res
+      .status(400)
+      .json({ error: "Missing required field: employee_email" });
   }
 
   // Log the incoming file details
@@ -21,11 +22,14 @@ const createEmployee = async (req, res) => {
 
   try {
     // Check if the employee already exists
-    const employeeExists = await employeeService.checkIfEmployeeExists(req.body.employee_email);
-    
+    const employeeExists = await employeeService.checkIfEmployeeExists(
+      req.body.employee_email
+    );
+
     if (employeeExists) {
       return res.status(400).json({
-        error: "This email address is already associated with another employee!",
+        error:
+          "This email address is already associated with another employee!",
       });
     }
 
@@ -55,7 +59,7 @@ const createEmployee = async (req, res) => {
 
     // Create the employee
     const employee = await employeeService.createEmployee(
-      row1,   // Includes employee_image
+      row1, // Includes employee_image
       row2,
       row3,
       employeePassword
@@ -94,25 +98,31 @@ async function getAllEmployees(req, res, next) {
     });
   }
 }
-async function updateEmployee(req, res, next) {
-  const updatedEmployeeData = req.body;
+async function updateEmployee(req, res) {
   try {
-    const result = await employeeService.updateEmployee(updatedEmployeeData);
-    if (!result) {
+    // Validate required fields
+    if (!req.body.employee_id) {
       return res.status(400).json({
-        error: "Failed to update employee!",
+        status: "fail",
+        error: "Employee ID is required",
       });
     }
+
+    // Process the update
+    const result = await employeeService.updateEmployee(req.body);
+
     res.status(200).json({
-      success: "true",
-      message: "Employee updated successfully",
+      status: "success",
+      data: result,
     });
   } catch (error) {
-    console.log("Controller Error:", error.message);
-    res.status(500).json({
-      error: "Internal Server Error",
+    console.error("Controller error:", error);
+
+    const statusCode = error.message.includes("not found") ? 404 : 500;
+    res.status(statusCode).json({
+      status: "error",
+      error: error.message || "Internal server error",
     });
-    // console.log("controller error",error)
   }
 }
 //create the delete employee controller
@@ -225,12 +235,12 @@ async function changePassword(req, res, next) {
 }
 
 module.exports = {
-    createEmployee,
-    getAllEmployees,
-    updateEmployee,
-    deleteEmployee,
-    getEmployeeById,
-    resetEmployeePassword,
-    changePassword,
-    getEmployeeStats,
-}
+  createEmployee,
+  getAllEmployees,
+  updateEmployee,
+  deleteEmployee,
+  getEmployeeById,
+  resetEmployeePassword,
+  changePassword,
+  getEmployeeStats,
+};

@@ -95,31 +95,39 @@ async function getServicesByOrderId(req, res) {
     res.status(500).json({ message: "Internal server error" });
   }
 }
-const updateServiceStatus = async (req, res) => {
-  const { orderServiceId, status } = req.body;
-  console.log("Received in controller:", { orderServiceId, status });
 
-  if (!orderServiceId || !status) {
-    return res.status(400).json({ message: "Missing required fields" });
+const updateOrderServiceStatus = async (req, res) => {
+  const { order_service_id } = req.params;
+  console.log(order_service_id);
+
+  const { service_status } = req.body;
+  console.log(service_status);
+
+  if (!["Pending", "In Progress", "Completed"].includes(service_status)) {
+    return res.status(400).json({ message: "Invalid service status" });
   }
 
   try {
-    const result = await serviceService.updateServiceStatus(
-      orderServiceId,
-      status
+    const updatedService = await serviceService.updateServiceStatus(
+      order_service_id,
+      service_status
     );
-    res.status(200).json(result);
-  } catch (error) {
-    console.error("Error updating service status:", error);
-    res.status(500).json({
-      message: "Internal server error",
-      error: error.message,
+
+    if (!updatedService) {
+      return res.status(404).json({ message: "Order service not found" });
+    }
+
+    console.log(updatedService);
+
+    res.status(200).json({
+      message: "Service status updated successfully",
+      service: updatedService, // return updated service data
     });
+  } catch (err) {
+    console.error("Update failed:", err);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
-
-
-
 
 module.exports = {
   getAllServices,
@@ -129,5 +137,5 @@ module.exports = {
   deactivateService,
   getServicesByVehicleType,
   getServicesByOrderId,
-  updateServiceStatus,
+  updateOrderServiceStatus,
 };

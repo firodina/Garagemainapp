@@ -15,6 +15,7 @@ async function createOrder(req, res) {
   try {
     // Call the service to create the order
     const result = await orderService.createOrder(orderData);
+    console.log(result);
     return res
       .status(201)
       .json({ message: "Order created successfully", order: result });
@@ -72,7 +73,9 @@ const updateOrderStatus = async (req, res) => {
 };
 
 const getOrdersByCustomerId = async (req, res) => {
-  const { customerId } = req.params;
+  console.log(req.params.customerId);
+  let { customerId } = req.params;
+  console.log(customerId);
   try {
     const orders = await orderService.getOrdersByCustomerId(customerId);
     res.status(200).json(orders);

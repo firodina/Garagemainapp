@@ -1,23 +1,73 @@
 const customerService = require("../services/customer.service");
+const {
+  notifyAdminNewCustomer,
+} = require("../services/notifyAdminNewCustomer"); // adjust path
 
 // Controller to add a customer
 // Backend - Controller
-async function addCustomer(req, res) {
+const addCustomer = async (req, res) => {
   try {
-    // Check if the requester is an admin (by checking the user's role)
-    const isAdmin = req.user && req.user.role === "admin"; 
+    const isAdmin = req.user?.company_role_id === 3;
 
-    // Call the service to add the customer
-    const customer = await customerService.addCustomer(req.body, isAdmin);
-
-    console.log("Customer added successfully:", customer);
-    res.status(201).json({ message: "Customer added successfully", customer });
+    const newCustomer = await customerService.addCustomer(req.body, isAdmin);
+    res.status(201).json(newCustomer);
   } catch (error) {
-    console.error("Error adding customer:", error.message);
-    res.status(500).json({ error: error.message });
+    console.error("Controller Error:", error.message);
+    res.status(500).json({ error: "Failed to add customer" });
   }
-}
+};
 
+const publicCustomerSignUp = async (req, res) => {
+  try {
+    const {
+      first_name,
+      last_name,
+      phone,
+      email,
+      password,
+      address,
+      registered_at,
+    } = req.body;
+
+    if (!first_name || !last_name || !phone || !email || !password) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    const existingCustomer = await customerService.getCustomerByEmail(email);
+    if (existingCustomer) {
+      return res.status(400).json({ error: "Email already in use" });
+    }
+
+    const customerData = {
+      first_name: first_name.trim(),
+      last_name: last_name.trim(),
+      phone,
+      email,
+      password,
+      address,
+      registered_at: registered_at || new Date().toISOString(),
+    };
+
+    const newCustomer = await customerService.addCustomer(customerData, false);
+
+    // ✅ Notify admin of new signup
+    await notifyAdminNewCustomer(newCustomer);
+
+    res.status(201).json({
+      message: "Customer registered successfully. Awaiting admin approval.",
+      customer: {
+        id: newCustomer.customer_id,
+        first_name: newCustomer.first_name,
+        last_name: newCustomer.last_name,
+        phone: newCustomer.phone,
+        email: newCustomer.email,
+      },
+    });
+  } catch (error) {
+    console.error("Public Customer Sign-Up Error:", error.message);
+    res.status(500).json({ error: "Failed to register customer" });
+  }
+};
 
 // Controller to get all customers
 async function getAllCustomers(req, res) {
@@ -93,7 +143,6 @@ async function deleteCustomer(req, res) {
 async function getCustomerByEmail(req, res) {
   try {
     const { email } = req.params;
-    console.log(email);
 
     if (!email) {
       return res
@@ -120,7 +169,7 @@ async function getCustomerByEmail(req, res) {
 // Create the getEmployeeStats controller
 async function getCustomerStatus(req, res, next) {
   const customerStatus = await customerService.getCustomerStatus();
-  console.log(customerStatus);
+
   if (!customerStatus) {
     return res.status(400).json({
       error: "Failed to get customer status!",
@@ -128,9 +177,74 @@ async function getCustomerStatus(req, res, next) {
   }
   res.status(200).json({
     status: "success",
-   
+
     data: customerStatus,
   });
+}
+
+const getNonApprovedCustomers = async (req, res) => {
+  try {
+    const customers = await customerService.getCustomersByApprovalStatus(0);
+
+    res.status(200).json(customers);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching non-approved customers" });
+  }
+};
+// CONTROLLER
+const approveCustomer = async (req, res) => {
+  const { customerId } = req.params;
+
+  try {
+    const result = await customerService.approveCustomer(customerId);
+    res.json({ message: "Customer approved successfully", result });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const unapproveCustomer = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await customerService.unapproveCustomer(id);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Customer not found." });
+    }
+
+    res.status(200).json({ message: "Customer unapproved successfully." });
+  } catch (error) {
+    console.error("Error unapproving customer:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
+
+// In customer.controller.js
+
+async function changePassword(req, res) {
+  const customerId = req.params.customerId;
+  const newPassword = req.body.newPassword;
+
+  try {
+    const result = await customerService.changePassword(
+      customerId,
+      newPassword
+    );
+
+    if (!result) {
+      return res.status(400).json({ error: "Failed to change password!" });
+    }
+
+    res.status(200).json({
+      success: "true",
+      message: "Password changed successfully",
+    });
+  } catch (error) {
+    console.error("Controller Error:", error.message);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 }
 
 // Export all controllers
@@ -142,4 +256,9 @@ module.exports = {
   deleteCustomer,
   getCustomerByEmail,
   getCustomerStatus,
+  getNonApprovedCustomers,
+  approveCustomer,
+  unapproveCustomer,
+  publicCustomerSignUp,
+  changePassword,
 };
