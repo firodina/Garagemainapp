@@ -1,5 +1,6 @@
 const bcrypt = require("bcrypt");
 const db = require("../config/db.config");
+const { sendEmail, sendSMS } = require("./notification.service"); // Adjust the path accordingly
 
 // Add a new customer
 // Backend - Service
@@ -32,6 +33,13 @@ async function addCustomer(customerData, isAdmin) {
     password,
   } = customerData;
 
+  // Convert registered_at to the correct format
+  const registeredAtDate = new Date(registered_at);
+  const formattedRegisteredAt = registeredAtDate
+    .toISOString()
+    .slice(0, 19)
+    .replace("T", " ");
+
   const approved = isAdmin ? 1 : 0;
 
   const connection = await db.pool.getConnection();
@@ -43,7 +51,7 @@ async function addCustomer(customerData, isAdmin) {
 
     const [resultIdentifier] = await connection.query(
       insertCustomerIdentifierQuery,
-      [4, email, phone, registered_at, approved]
+      [4, email, phone, formattedRegisteredAt, approved] // Use formattedRegisteredAt here
     );
 
     const customer_id = resultIdentifier.insertId;
@@ -61,6 +69,27 @@ async function addCustomer(customerData, isAdmin) {
     ]);
 
     await connection.commit();
+
+    const welcomeMessage = `
+Welcome to ORBIS Trading and Services Center, ${first_name}!
+
+Your account has been created successfully.
+
+📧 Email: ${email}
+🔐 Password: ${password}
+
+You can now log in and start using our services.
+
+Thank you!
+    `.trim();
+
+    if (email) {
+      await sendEmail(email, welcomeMessage, "Your ORBIS Account Details");
+    }
+
+    if (phone) {
+      await sendSMS(phone, welcomeMessage);
+    }
 
     return {
       customer_id,
@@ -183,21 +212,74 @@ async function updateCustomer(customerData) {
 async function deleteCustomer(customerId) {
   const connection = await db.pool.getConnection();
   try {
-    const query = `
-      DELETE customer_info, customer_identifier
-      FROM customer_info
-      INNER JOIN customer_identifier
-      ON customer_info.customer_id = customer_identifier.customer_id
-      WHERE customer_info.customer_id = ?`;
+    await connection.beginTransaction();
 
-    const [result] = await connection.query(query, [customerId]);
+    // 1. Get all appointment IDs for the customer
+    const [appointments] = await connection.query(
+      "SELECT appointment_id FROM appointments WHERE customer_id = ?",
+      [customerId]
+    );
+    const appointmentIds = appointments.map((a) => a.appointment_id);
+
+    // 2. Delete from appointment_notifications
+    if (appointmentIds.length > 0) {
+      await connection.query(
+        "DELETE FROM appointment_notifications WHERE appointment_id IN (?)",
+        [appointmentIds]
+      );
+
+      // 3. Delete from appointments
+      await connection.query(
+        "DELETE FROM appointments WHERE appointment_id IN (?)",
+        [appointmentIds]
+      );
+    }
+
+    // 4. Delete from house_service_requests
+    await connection.query(
+      "DELETE FROM house_service_requests WHERE customer_id = ?",
+      [customerId]
+    );
+
+    // 5. Get all order IDs for the customer
+    const [orders] = await connection.query(
+      "SELECT order_id FROM orders WHERE customer_id = ?",
+      [customerId]
+    );
+    const orderIds = orders.map((o) => o.order_id);
+
+    // 6. Delete from order_services (child of orders)
+    if (orderIds.length > 0) {
+      await connection.query(
+        "DELETE FROM order_services WHERE order_id IN (?)",
+        [orderIds]
+      );
+    }
+
+    // 7. Delete from orders
+    await connection.query("DELETE FROM orders WHERE customer_id = ?", [
+      customerId,
+    ]);
+
+    // 8. Delete from customer_info
+    await connection.query("DELETE FROM customer_info WHERE customer_id = ?", [
+      customerId,
+    ]);
+
+    // 9. Delete from customer_identifier
+    const [result] = await connection.query(
+      "DELETE FROM customer_identifier WHERE customer_id = ?",
+      [customerId]
+    );
 
     if (result.affectedRows === 0) {
       throw new Error("No customer found to delete");
     }
 
+    await connection.commit();
     return { success: true };
   } catch (error) {
+    await connection.rollback();
     console.error("Error deleting customer:", error);
     throw new Error("Failed to delete customer");
   } finally {
@@ -283,8 +365,18 @@ WHERE
   return rows;
 };
 
+// Helper to format phone numbers (assumes Ethiopia +251 by default)
+const formatToE164 = (phone, countryCode = "251") => {
+  let cleaned = phone.replace(/[^0-9]/g, "");
+  if (cleaned.startsWith("0")) {
+    cleaned = cleaned.slice(1);
+  }
+  return `+${countryCode}${cleaned}`;
+};
+
 const approveCustomer = async (customerId) => {
   try {
+    // Step 1: Update the approval status
     const result = await db.query(
       "UPDATE customer_identifier SET approved = TRUE WHERE customer_id = ?",
       [customerId]
@@ -294,10 +386,39 @@ const approveCustomer = async (customerId) => {
       throw new Error("Customer not found");
     }
 
+    // Step 2: Fetch the customer's email and phone
+    const [customerData] = await db.query(
+      "SELECT email, phone FROM customer_identifier WHERE customer_id = ?",
+      [customerId]
+    );
+
+    const customerEmail = customerData?.email;
+    const customerPhone = customerData?.phone;
+
+    // Step 3: Prepare message
+    const message = `✅ Your account has been approved! You can now log in.`;
+    const subject = "Account Approval Notification";
+
+    const notifications = [];
+
+    if (customerEmail) {
+      notifications.push(sendEmail([customerEmail], message, subject));
+    }
+
+    if (customerPhone) {
+      const formattedPhone = formatToE164(customerPhone);
+      notifications.push(sendSMS(formattedPhone, message));
+    }
+
+    // Step 4: Send notifications
+    await Promise.all(notifications);
+
     return result;
   } catch (error) {
     console.error("Error in approveCustomer service:", error);
     throw error;
+  } finally {
+    connection.release();
   }
 };
 
@@ -307,6 +428,26 @@ const unapproveCustomer = async (customerId) => {
   const result = await db.execute(query, [customerId]); // use `execute` if using mysql2 or promise-based db
   return result;
 };
+
+async function changePassword(customerId, newPassword) {
+  try {
+    const query =
+      "UPDATE customer_pass SET customer_password_hashed = ? WHERE customer_id = ?";
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+    const result = await db.query(query, [hashedPassword, customerId]);
+
+    console.log(result);
+    if (result.affectedRows === 0) {
+      throw new Error("Failed to update customer password.");
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Service Error:", error.message);
+    throw error;
+  }
+}
 
 // Export all services
 module.exports = {
@@ -320,4 +461,5 @@ module.exports = {
   getCustomersByApprovalStatus,
   approveCustomer,
   unapproveCustomer,
+  changePassword,
 };

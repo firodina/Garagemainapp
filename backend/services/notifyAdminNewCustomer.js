@@ -1,4 +1,4 @@
-const { sendEmail, sendSMS } = require('./notification.service'); 
+const { sendEmail, sendSMS } = require("./notification.service");
 
 async function notifyAdminNewCustomer(customer) {
   const subject = "New Customer Awaiting Approval";
@@ -10,7 +10,7 @@ A new customer has registered and is awaiting your approval:
 👤 Name: ${customer.first_name} ${customer.last_name}
 📧 Email: ${customer.email}
 📞 Phone: ${customer.phone}
-🏠 Address: ${customer.address || 'N/A'}
+🏠 Address: ${customer.address || "N/A"}
 
 Please log in to the admin panel to review and approve the account.
 
@@ -30,4 +30,4 @@ ORBIS System
   }
 }
 
-module.exports = {notifyAdminNewCustomer};
+module.exports = { notifyAdminNewCustomer };

@@ -1,11 +1,10 @@
--- Employee Management
+-- Company Roles
 CREATE TABLE IF NOT EXISTS company_roles (
   company_role_id INT AUTO_INCREMENT PRIMARY KEY,
   company_role_name VARCHAR(255) NOT NULL UNIQUE
 ) ENGINE=InnoDB;
 
 -- Employee Management
-
 CREATE TABLE IF NOT EXISTS employee (
   employee_id INT AUTO_INCREMENT PRIMARY KEY,
   employee_email VARCHAR(255) NOT NULL UNIQUE,
@@ -46,7 +45,7 @@ CREATE TABLE IF NOT EXISTS customer_identifier (
   phone VARCHAR(20) NOT NULL UNIQUE,
   registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   approved BOOLEAN DEFAULT FALSE,
-  FOREIGN KEY (company_role_id) REFERENCES company_roles (company_role_id)
+  FOREIGN KEY (company_role_id) REFERENCES company_roles(company_role_id)
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS customer_info (
@@ -75,20 +74,54 @@ CREATE TABLE IF NOT EXISTS customer_interactions (
   FOREIGN KEY (customer_id) REFERENCES customer_identifier(customer_id)
 ) ENGINE=InnoDB;
 
+-- Vehicle Type Management
+CREATE TABLE IF NOT EXISTS vehicle_types (
+  vehicle_type_id INT AUTO_INCREMENT PRIMARY KEY,
+  vehicle_type_name VARCHAR(100) NOT NULL UNIQUE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS vehicles (
+  vehicle_id INT AUTO_INCREMENT PRIMARY KEY,
+  customer_id INT NOT NULL,
+  vehicle_type_id INT NOT NULL,
+  make VARCHAR(100),
+  model VARCHAR(100),
+  year INT,
+  VIN VARCHAR(50) UNIQUE,
+  FOREIGN KEY (customer_id) REFERENCES customer_identifier(customer_id),
+  FOREIGN KEY (vehicle_type_id) REFERENCES vehicle_types(vehicle_type_id)
+) ENGINE=InnoDB;
+
+-- Service Type Management
+CREATE TABLE IF NOT EXISTS service_types (
+  service_type_id INT AUTO_INCREMENT PRIMARY KEY,
+  service_name VARCHAR(255) NOT NULL,
+  description TEXT,
+  duration INT NOT NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS service_pricing (
+  service_pricing_id INT AUTO_INCREMENT PRIMARY KEY,
+  service_type_id INT NOT NULL,
+  vehicle_type_id INT NOT NULL,
+  price DECIMAL(10,2) NOT NULL,
+  FOREIGN KEY (service_type_id) REFERENCES service_types(service_type_id),
+  FOREIGN KEY (vehicle_type_id) REFERENCES vehicle_types(vehicle_type_id)
+) ENGINE=InnoDB;
+
 -- Order Management
 CREATE TABLE IF NOT EXISTS orders (
   order_id INT AUTO_INCREMENT PRIMARY KEY,
   customer_id INT NOT NULL,
-  vehicle_id INT NOT NULL, -- ✅ Add this line
-  employee_id INT DEFAULT NULL, 
+  vehicle_id INT NOT NULL,
+  employee_id INT DEFAULT NULL,
   order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   total_price DECIMAL(10,2) NOT NULL,
-
+  slot_time TIME NOT NULL,
   FOREIGN KEY (customer_id) REFERENCES customer_identifier(customer_id),
-  FOREIGN KEY (vehicle_id) REFERENCES vehicles(vehicle_id), -- ✅ Add this FK constraint
+  FOREIGN KEY (vehicle_id) REFERENCES vehicles(vehicle_id),
   FOREIGN KEY (employee_id) REFERENCES employee(employee_id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
-
 
 CREATE TABLE IF NOT EXISTS order_status (
   order_status_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -97,7 +130,6 @@ CREATE TABLE IF NOT EXISTS order_status (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (order_id) REFERENCES orders(order_id)
 ) ENGINE=InnoDB;
-
 
 CREATE TABLE IF NOT EXISTS tasks (
   task_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -115,10 +147,16 @@ CREATE TABLE IF NOT EXISTS tasks (
 CREATE TABLE IF NOT EXISTS appointments (
   appointment_id INT AUTO_INCREMENT PRIMARY KEY,
   customer_id INT NOT NULL,
+  service_type_id INT NOT NULL,
+  vehicle_type_id INT NOT NULL,
   service_date DATETIME NOT NULL,
-  status ENUM('Booked', 'Rescheduled', 'Canceled') NOT NULL DEFAULT 'Booked',
   time_slot TIME NOT NULL,
-  FOREIGN KEY (customer_id) REFERENCES customer_identifier(customer_id)
+  status ENUM('Booked', 'Rescheduled', 'Canceled') NOT NULL DEFAULT 'Booked',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (customer_id) REFERENCES customer_identifier(customer_id),
+  FOREIGN KEY (service_type_id) REFERENCES service_types(service_type_id),
+  FOREIGN KEY (vehicle_type_id) REFERENCES vehicle_types(vehicle_type_id)
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS appointment_notifications (
@@ -126,14 +164,20 @@ CREATE TABLE IF NOT EXISTS appointment_notifications (
   appointment_id INT NOT NULL,
   message TEXT NOT NULL,
   sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  status ENUM('Sent', 'Pending', 'Failed') NOT NULL DEFAULT 'Pending',
+  type ENUM('Email', 'SMS', 'Push Notification') NOT NULL,
   FOREIGN KEY (appointment_id) REFERENCES appointments(appointment_id)
 ) ENGINE=InnoDB;
 
--- Secure Payment Processing
+-- Payment Management
 CREATE TABLE IF NOT EXISTS payments (
   payment_id INT AUTO_INCREMENT PRIMARY KEY,
   order_id INT NOT NULL,
   amount DECIMAL(10,2) NOT NULL,
+  tx_ref VARCHAR(255) UNIQUE,
+  chapa_status VARCHAR(50) DEFAULT 'Pending',
+  approval_status ENUM('Not Approved', 'Approved') DEFAULT 'Not Approved',
+  payment_date DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (order_id) REFERENCES orders(order_id)
 ) ENGINE=InnoDB;
 
@@ -155,8 +199,10 @@ CREATE TABLE IF NOT EXISTS payment_receipts (
   receipt_id INT AUTO_INCREMENT PRIMARY KEY,
   payment_id INT NOT NULL,
   receipt_details TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
   FOREIGN KEY (payment_id) REFERENCES payments(payment_id)
 ) ENGINE=InnoDB;
+
 
 -- Notifications
 CREATE TABLE IF NOT EXISTS sms_notifications (
@@ -189,8 +235,7 @@ CREATE TABLE IF NOT EXISTS report_data (
   FOREIGN KEY (report_id) REFERENCES reports(report_id)
 ) ENGINE=InnoDB;
 
-
--- Role-based access (merged users table into employee and customer_identifier)
+-- Audit Logs
 CREATE TABLE IF NOT EXISTS audit_logs (
   log_id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
@@ -199,7 +244,7 @@ CREATE TABLE IF NOT EXISTS audit_logs (
   FOREIGN KEY (user_id) REFERENCES employee(employee_id)
 ) ENGINE=InnoDB;
 
--- Intermediary table for order and payment relations (if a payment can be split across multiple orders)
+-- Intermediary table for order and payment relations
 CREATE TABLE IF NOT EXISTS order_payments (
   order_payment_id INT AUTO_INCREMENT PRIMARY KEY,
   order_id INT NOT NULL,
@@ -209,7 +254,7 @@ CREATE TABLE IF NOT EXISTS order_payments (
   FOREIGN KEY (payment_id) REFERENCES payments(payment_id)
 ) ENGINE=InnoDB;
 
--- Resource Scheduling (NEW)
+-- Resource Scheduling
 CREATE TABLE IF NOT EXISTS resources (
   resource_id INT AUTO_INCREMENT PRIMARY KEY,
   resource_name VARCHAR(255) NOT NULL,
@@ -226,7 +271,7 @@ CREATE TABLE IF NOT EXISTS resource_schedules (
   FOREIGN KEY (resource_id) REFERENCES resources(resource_id)
 ) ENGINE=InnoDB;
 
--- Payment Flexibility (NEW)
+-- Payment Flexibility
 CREATE TABLE IF NOT EXISTS payment_installments (
   installment_id INT AUTO_INCREMENT PRIMARY KEY,
   payment_id INT NOT NULL,
@@ -235,7 +280,7 @@ CREATE TABLE IF NOT EXISTS payment_installments (
   FOREIGN KEY (payment_id) REFERENCES payments(payment_id)
 ) ENGINE=InnoDB;
 
--- Service Role Permissions (NEW)
+-- Service Role Permissions
 CREATE TABLE IF NOT EXISTS role_permissions (
   role_permission_id INT AUTO_INCREMENT PRIMARY KEY,
   role_id INT NOT NULL,
@@ -250,6 +295,7 @@ CREATE TABLE IF NOT EXISTS customer_pass (
   FOREIGN KEY (customer_id) REFERENCES customer_identifier(customer_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
+-- Vehicle Type Management
 CREATE TABLE IF NOT EXISTS vehicle_types (
   vehicle_type_id INT AUTO_INCREMENT PRIMARY KEY,
   vehicle_type_name VARCHAR(100) NOT NULL UNIQUE
@@ -267,22 +313,7 @@ CREATE TABLE IF NOT EXISTS vehicles (
   FOREIGN KEY (vehicle_type_id) REFERENCES vehicle_types(vehicle_type_id)
 ) ENGINE=InnoDB;
 
--- Vehicle Type Management (NEW)
-CREATE TABLE IF NOT EXISTS service_types (
-  service_type_id INT AUTO_INCREMENT PRIMARY KEY,
-  service_name VARCHAR(255) NOT NULL,
-  description TEXT
-) ENGINE=InnoDB;
-
-CREATE TABLE IF NOT EXISTS service_pricing (
-  service_pricing_id INT AUTO_INCREMENT PRIMARY KEY,
-  service_type_id INT NOT NULL,
-  vehicle_type_id INT NOT NULL,
-  price DECIMAL(10,2) NOT NULL,
-  FOREIGN KEY (service_type_id) REFERENCES service_types(service_type_id),
-  FOREIGN KEY (vehicle_type_id) REFERENCES vehicle_types(vehicle_type_id)
-) ENGINE=InnoDB;
-
+-- Vehicle Service History
 CREATE TABLE IF NOT EXISTS vehicle_service_history (
   service_id INT AUTO_INCREMENT PRIMARY KEY,
   vehicle_id INT NOT NULL,
@@ -296,6 +327,7 @@ CREATE TABLE IF NOT EXISTS vehicle_service_history (
   FOREIGN KEY (service_pricing_id) REFERENCES service_pricing(service_pricing_id)
 ) ENGINE=InnoDB;
 
+-- Order Services
 CREATE TABLE IF NOT EXISTS order_services (
   order_service_id INT AUTO_INCREMENT PRIMARY KEY,
   order_id INT NOT NULL,
@@ -305,6 +337,7 @@ CREATE TABLE IF NOT EXISTS order_services (
   FOREIGN KEY (service_type_id) REFERENCES service_types(service_type_id)
 ) ENGINE=InnoDB;
 
+-- Service Status Updates
 CREATE TABLE IF NOT EXISTS service_status_updates (
   status_update_id INT AUTO_INCREMENT PRIMARY KEY,
   order_service_id INT NOT NULL,
@@ -313,20 +346,39 @@ CREATE TABLE IF NOT EXISTS service_status_updates (
   FOREIGN KEY (order_service_id) REFERENCES order_services(order_service_id)
 ) ENGINE=InnoDB;
 
+--house service request 
+CREATE TABLE IF NOT EXISTS house_service_requests (
+  request_id INT AUTO_INCREMENT PRIMARY KEY,
+  customer_id INT NOT NULL,
+  vehicle_id INT NOT NULL,
+  service_type_id INT NOT NULL,
+  address TEXT NOT NULL,
+  latitude DECIMAL(10, 8),
+  longitude DECIMAL(11, 8),
+  preferred_date DATE NOT NULL,
+  preferred_time TIME NOT NULL,
+  assigned_employee_id INT DEFAULT NULL,
+  status ENUM('Requested', 'Assigned', 'In Progress', 'Completed', 'Canceled') DEFAULT 'Requested',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (customer_id) REFERENCES customer_identifier(customer_id),
+  FOREIGN KEY (vehicle_id) REFERENCES vehicles(vehicle_id),
+  FOREIGN KEY (service_type_id) REFERENCES service_types(service_type_id),
+  FOREIGN KEY (assigned_employee_id) REFERENCES employee(employee_id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
 -- Predefined roles for the company
 INSERT INTO company_roles (company_role_name) VALUES
 ('Employee'), ('Manager'), ('Admin'), ('Customer')
 ON DUPLICATE KEY UPDATE company_role_name = company_role_name;
-
--- Insert Admin
 -- Insert Admin
 INSERT INTO employee (employee_email, active_employee, added_date, employee_image)
-VALUES ('admin@admins.com', 1, CURRENT_TIMESTAMP, 'https://media.istockphoto.com/id/1399565382/photo/young-happy-mixed-race-businessman-standing-with-his-arms-crossed-working-alone-in-an-office.jpg?s=612x612&w=0&k=20&c=buXwOYjA_tjt2O3-kcSKqkTp2lxKWJJ_Ttx2PhYe3VM=');
+VALUES ('rowdahassan49@gmail.com', 1, CURRENT_TIMESTAMP, 'https://media.istockphoto.com/id/1399565382/photo/young-happy-mixed-race-businessman-standing-with-his-arms-crossed-working-alone-in-an-office.jpg?s=612x612&w=0&k=20&c=buXwOYjA_tjt2O3-kcSKqkTp2lxKWJJ_Ttx2PhYe3VM=');
 
 SET @admin_id = LAST_INSERT_ID();
 
 INSERT INTO employee_info (employee_id, employee_first_name, employee_last_name, employee_phone)
-VALUES (@admin_id, 'Admin', 'Admin', '777-777-7777');
+VALUES (@admin_id, 'Admin', 'Admin', '0960574644');
 
 INSERT INTO employee_pass (employee_id, employee_password_hashed)
 VALUES (@admin_id, '$2b$10$ceYuf8esgIge0dnr01SGO.Q8Qhn.c4q4kTg.TS4A40.oj0aSwbhG2');

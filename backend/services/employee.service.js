@@ -1,6 +1,11 @@
 const bcrypt = require("bcrypt");
 const conn = require("../config/db.config");
+const { pool, query } = require("../config/db.config");
+const { sendEmail, sendSMS } = require("./notification.service");
 
+const formatToE164 = (phone) => {
+  return phone.startsWith("+") ? phone : "+251" + phone.slice(1);
+};
 /// A function to check if employee exists in the database
 async function checkIfEmployeeExists(email) {
   console.log("Checking employee existence for email:", email);
@@ -18,20 +23,15 @@ async function createEmployee(row1, row2, row3, employee_password) {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(employee_password, salt);
 
-    // Insert the employee information, including the image path
+    // 1. Insert into `employee` table
     const query =
       "INSERT INTO employee (employee_email, active_employee, added_date, employee_image) VALUES (?, ?, NOW(), ?)";
+    const rows = await conn.query(query, [row1[0], row1[1], row1[2]]);
+    if (rows.affectedRows !== 1) return false;
 
-    const rows = await conn.query(query, [row1[0], row1[1], row1[2]]); // row1[2] is the employee_image
-
-    if (rows.affectedRows !== 1) {
-      return false;
-    }
-
-    // Get the employee ID from the insert
     const employee_id = rows.insertId;
 
-    // Insert data into related tables
+    // 2. Insert into `employee_info`
     const query2 =
       "INSERT INTO employee_info (employee_id, employee_first_name, employee_last_name, employee_phone) VALUES (?, ?, ?, ?)";
     const rows2 = await conn.query(query2, [
@@ -40,32 +40,58 @@ async function createEmployee(row1, row2, row3, employee_password) {
       row2[1],
       row2[2],
     ]);
+    if (rows2.affectedRows !== 1) return false;
 
-    if (rows2.affectedRows !== 1) {
-      return false;
-    }
-
+    // 3. Insert into `employee_pass`
     const query3 =
       "INSERT INTO employee_pass (employee_id, employee_password_hashed) VALUES (?, ?)";
     const rows3 = await conn.query(query3, [employee_id, hashedPassword]);
+    if (rows3.affectedRows !== 1) return false;
 
-    if (rows3.affectedRows !== 1) {
-      return false;
-    }
-
+    // 4. Insert into `employee_role`
     const query4 =
       "INSERT INTO employee_role (employee_id, company_role_id) VALUES (?, ?)";
     const rows4 = await conn.query(query4, [employee_id, row3[0]]);
+    if (rows4.affectedRows !== 1) return false;
 
-    if (rows4.affectedRows !== 1) {
-      return false;
-    } else {
-      console.log("employee created");
-      return true;
+    // 5. Send welcome SMS and email with login info
+    const employee_email = row1[0];
+    const employee_phone = row2[2];
+    const fullName = `${row2[0]} ${row2[1]}`;
+
+    const message = `
+🎉 Welcome to ORBIS, ${fullName}!
+
+Your employee account has been successfully created.
+
+📧 Email: ${employee_email}
+🔐 Temporary Password: ${employee_password}
+
+Please log in and change your password as soon as possible.
+
+ORBIS Trading and Services Center.
+    `.trim();
+
+    const subject = "Your ORBIS Employee Account";
+
+    const notifications = [];
+
+    if (employee_email) {
+      notifications.push(sendEmail(employee_email, message, subject));
     }
+
+    if (employee_phone) {
+      const formattedPhone = formatToE164(employee_phone);
+      notifications.push(sendSMS(formattedPhone, message));
+    }
+
+    await Promise.all(notifications);
+
+    console.log("✅ Employee created and notified.");
+    return true;
   } catch (err) {
-    console.error("Error creating employee:", err);
-    return false; // Return false in case of errors
+    console.error("❌ Error creating employee:", err);
+    return false;
   }
 }
 
@@ -181,74 +207,60 @@ async function deleteEmployee(employee_id) {
     return false;
   }
 }
+
 async function updateEmployee(updatedEmployeeData) {
-  let hashedPassword = null;
-  const {
-    employee_id,
-    employee_first_name,
-    employee_last_name,
-    employee_phone,
-    employee_email,
-    employee_password,
-  } = updatedEmployeeData;
-
-  // If a new password is provided, hash it
-  if (employee_password) {
-    const salt = await bcrypt.genSalt(10);
-    hashedPassword = await bcrypt.hash(employee_password, salt);
-  }
-
+  let connection;
   try {
-    // Update employee email
-    const query1 = `UPDATE employee SET employee_email = ? WHERE employee_id = ?`;
-    const result1 = await conn.query(query1, [employee_email, employee_id]);
+    connection = await pool.getConnection();
+    await connection.beginTransaction();
 
-    if (result1.affectedRows === 0) {
-      console.error("No employee found with employee_id:", employee_id);
-      throw new Error("No employee found with the provided employee_id");
+    const {
+      employee_id,
+      employee_first_name = null,
+      employee_last_name = null,
+      employee_phone = null,
+      employee_email = null,
+      employee_password,
+    } = updatedEmployeeData;
+
+    // Update email if provided
+    if (employee_email !== null) {
+      await connection.query(
+        "UPDATE employee SET employee_email = ? WHERE employee_id = ?",
+        [employee_email, employee_id]
+      );
     }
 
     // Update employee info
-    const query2 = `
-            UPDATE employee_info 
-            SET employee_first_name = ?, employee_last_name = ?, employee_phone = ? 
-            WHERE employee_id = ?`;
-    const result2 = await conn.query(query2, [
-      employee_first_name,
-      employee_last_name,
-      employee_phone,
-      employee_id,
-    ]);
+    await connection.query(
+      `UPDATE employee_info 
+       SET employee_first_name = ?, employee_last_name = ?, employee_phone = ?
+       WHERE employee_id = ?`,
+      [employee_first_name, employee_last_name, employee_phone, employee_id]
+    );
 
-    if (result2.affectedRows === 0) {
-      console.error(
-        "Failed to update employee info for employee_id:",
-        employee_id
+    // Update password if provided
+    if (employee_password) {
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(employee_password, salt);
+
+      await connection.query(
+        "UPDATE employee_pass SET employee_password_hashed = ? WHERE employee_id = ?",
+        [hashedPassword, employee_id]
       );
-      throw new Error("Failed to update employee info");
     }
 
-    // Update employee password if provided
-    if (hashedPassword) {
-      const query3 = `UPDATE employee_pass SET employee_password_hashed = ? WHERE employee_id = ?`;
-      const result3 = await conn.query(query3, [hashedPassword, employee_id]);
-
-      if (result3.affectedRows === 0) {
-        console.error(
-          "Failed to update employee password for employee_id:",
-          employee_id
-        );
-        throw new Error("Failed to update employee password");
-      }
-    }
-
-    return true; // Success
+    await connection.commit();
+    return { success: true, message: "Employee updated successfully" };
   } catch (error) {
-    console.error("Service Error:", error.message);
-
-    return false; // Fail
+    if (connection) await connection.rollback();
+    console.error("Update employee error:", error);
+    throw error;
+  } finally {
+    if (connection) connection.release();
   }
 }
+
 // function fetch employee status
 async function getEmployeeStats() {
   try {

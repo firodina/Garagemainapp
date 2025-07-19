@@ -56,16 +56,7 @@ async function logInCustomer(CustomerData) {
     if (!Customer) {
       returnData = {
         status: "fail",
-        message: "Customer does not exist",
-      };
-      return returnData;
-    }
-
-    if (Customer.approved !== 1) {
-      returnData = {
-        status: "fail",
-        message:
-          "Your account is not approved yet. Please wait for admin approval.",
+        message: "invalid email ",
       };
       return returnData;
     }
@@ -73,7 +64,7 @@ async function logInCustomer(CustomerData) {
     if (!CustomerData.customer_password || !Customer.password_hash) {
       returnData = {
         status: "fail",
-        message: "Missing password data",
+        message: "invalid email or password",
       };
       return returnData;
     }

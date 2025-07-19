@@ -1,5 +1,16 @@
 const conn = require("../config/db.config"); // Assume you're using a db connection with promises
 
+const { sendEmail, sendSMS } = require("./notification.service"); // adjust path if needed
+
+// Optional: Phone formatting helper (Ethiopia default)
+const formatToE164 = (phone, countryCode = "251") => {
+  let cleaned = phone.replace(/[^0-9]/g, "");
+  if (cleaned.startsWith("0")) {
+    cleaned = cleaned.substring(1);
+  }
+  return `+${countryCode}${cleaned}`;
+};
+
 async function createOrder(orderData) {
   const {
     customer_id,
@@ -9,6 +20,7 @@ async function createOrder(orderData) {
     order_date = new Date().toISOString().slice(0, 19).replace("T", " "),
     order_status = "Pending",
     services = [],
+    slot_time,
   } = orderData;
 
   if (!customer_id || !vehicle_id || !total_price || services.length === 0) {
@@ -17,12 +29,12 @@ async function createOrder(orderData) {
     );
   }
 
-  // Step 1: Insert into orders table
+  // Step 1: Insert into orders table (✅ added slot_time)
   const orderResult = await conn.query(
     `INSERT INTO orders 
-     (customer_id, vehicle_id, employee_id, order_date, total_price) 
-     VALUES (?, ?, ?, ?, ?)`,
-    [customer_id, vehicle_id, employee_id, order_date, total_price]
+     (customer_id, vehicle_id, employee_id, order_date, total_price, slot_time) 
+     VALUES (?, ?, ?, ?, ?, ?)`,
+    [customer_id, vehicle_id, employee_id, order_date, total_price, slot_time]
   );
 
   const order_id = orderResult.insertId;
@@ -33,24 +45,45 @@ async function createOrder(orderData) {
     [order_id, order_status]
   );
 
-  // Step 3: Insert each service into order_services and initial status update
+  // Step 3: Insert each service into order_services
   for (const { service_type_id } of services) {
-    const serviceResult = await conn.query(
+    await conn.query(
       `INSERT INTO order_services 
        (order_id, service_type_id, service_status) 
        VALUES (?, ?, ?)`,
       [order_id, service_type_id, "Pending"]
     );
-
-    const order_service_id = serviceResult.insertId;
-
-    await conn.query(
-      `INSERT INTO service_status_updates 
-       (order_service_id, status) 
-       VALUES (?, ?)`,
-      [order_service_id, "Inspection"]
-    );
   }
+
+  // Step 4: Fetch customer email and phone
+  const [customerData] = await conn.query(
+    "SELECT email, phone FROM customer_identifier WHERE customer_id = ?",
+    [customer_id]
+  );
+
+  const customerEmail = customerData?.email;
+  const customerPhone = customerData?.phone;
+
+  if (!customerEmail) {
+    throw new Error("Customer email not found");
+  }
+
+  if (!customerPhone) {
+    throw new Error("Customer phone number not found");
+  }
+
+  // Step 5: Prepare notification
+  const message =
+    `📦 Your order has been placed!\nOrder ID: ${order_id}\nTotal: ${total_price}\nStatus: ${order_status}` +
+    (slot_time ? `\nSlot Time: ${slot_time}` : "");
+  const subject = "Order Confirmation";
+
+  // Step 6: Send email
+  await sendEmail([customerEmail], message, subject);
+
+  // Step 7: Send SMS
+  const formattedPhone = formatToE164(customerPhone);
+  await sendSMS(formattedPhone, message);
 
   return { order_id, status: order_status };
 }
@@ -127,10 +160,37 @@ const getOrdersByCustomerId = async (customerId) => {
   return rows;
 };
 
+const getServicesByOrderId = async (orderId) => {
+  const query = `
+    SELECT 
+      os.order_service_id,
+      os.order_id,
+      st.service_type_id,
+      st.service_name,
+      st.description,
+      sp.price,
+      vt.vehicle_type_name
+    FROM 
+      order_services os
+    JOIN 
+      service_types st ON os.service_type_id = st.service_type_id
+    LEFT JOIN 
+      service_pricing sp ON st.service_type_id = sp.service_type_id
+    LEFT JOIN 
+      vehicle_types vt ON sp.vehicle_type_id = vt.vehicle_type_id
+    WHERE 
+      os.order_id = ?
+  `;
+
+  const rows = await conn.query(query, [orderId]);
+  return rows;
+};
+
 module.exports = {
   createOrder,
   getAllOrders,
   getOrderById,
   updateOrderStatus,
   getOrdersByCustomerId,
+  getServicesByOrderId,
 };
