@@ -7,58 +7,64 @@ const {
   addCustomer,
   getAllCustomers,
   deleteCustomer,
-  getCustomerStatus
+  getCustomerStatus,
+  getNonApprovedCustomers,
+  approveCustomer,
+  unapproveCustomer,
+  publicCustomerSignUp,
+  // updatePassword,
+  changePassword,
 } = require("../controllers/customer.controller");
 const {
   verifyToken,
-  // isManagerOrAdmin,
-  isOwnCustomer,
+  attachEmployeeInfo,
 } = require("../middlewares/auth.middleware");
 
 // Define the route to create a new customer
-router.post("/api/customer", addCustomer);
+router.post("/api/customer", verifyToken, attachEmployeeInfo, addCustomer);
+router.post("/api/customers", publicCustomerSignUp);
 
 // Get all customers (Admin, Employee, and Customer can access)
-router.get("/api/customers",
-  verifyToken, 
-  // isManagerOrAdmin,
-  getAllCustomers);
+router.get(
+  "/api/customers",
+  // verifyToken, isManagerOrAdmin,
+  getAllCustomers
+);
 
 // Get customer details by ID (Admin, Employee, and Customer can access)
 router.get(
   "/api/customer/:customer_id",
-  verifyToken,
+  // verifyToken,
   // isManagerOrAdmin,
-  isOwnCustomer,
+  // isOwnCustomer,
   getCustomerById
 );
 
 // Update customer details (only the customer can update their own details)
 router.put(
   "/api/customer/:id",
-  verifyToken,
-  isOwnCustomer,
+  // verifyToken,
   updateCustomer
 );
 
 // Define the route to get a customer by email
 router.get(
   "/api/customer/email/:email",
-  verifyToken,
-  isOwnCustomer,
+  // verifyToken,
   getCustomerByEmail
 );
 
 // Define the route to delete a customer by ID
-router.delete(
-  "/api/customer/:id",
-  verifyToken,
-  deleteCustomer
-);
+router.delete("/api/customer/:id", verifyToken, deleteCustomer);
 
-router.get("/api/customers/status", 
- 
-  getCustomerStatus
-);
+router.get("/api/customers/status", getCustomerStatus);
+router.get("/api/customers/non-approved", getNonApprovedCustomers);
 
+router.put("/api/customers/approve/:customerId", approveCustomer);
+
+// Route to unapprove a customer
+router.put("/:id/unapprove", unapproveCustomer);
+
+// Route to change password
+router.put("/api/customer/password/:customerId", changePassword);
 module.exports = router;
